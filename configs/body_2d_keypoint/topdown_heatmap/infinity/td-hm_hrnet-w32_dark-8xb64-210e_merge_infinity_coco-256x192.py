@@ -223,14 +223,14 @@ test_evaluator = val_evaluator
 vis_backends = [
     dict(type="LocalVisBackend"),
     # dict(type='TensorboardVisBackend'),
-    # dict(
-    #     type="WandbVisBackend",
-    #     init_kwargs=dict(
-    #         project="synthetic_finetuning",
-    #         entity="yonigoz",
-    #         name="merge_infinity_coco/HRNet/w32_dark",
-    #     ),
-    # ),
+    dict(
+        type="WandbVisBackend",
+        init_kwargs=dict(
+            project="synthetic_finetuning",
+            entity="yonigoz",
+            name="merge_infinity_coco/HRNet/w32_dark",
+        ),
+    ),
 ]
 visualizer = dict(
     type="PoseLocalVisualizer", vis_backends=vis_backends, name="visualizer"

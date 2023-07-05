@@ -118,8 +118,8 @@ val_pipeline = [
 
 # data loaders
 train_dataloader = dict(
-    batch_size=4,
-    num_workers=1,
+    batch_size=32,
+    num_workers=8,
     persistent_workers=True,
     sampler=dict(type="DefaultSampler", shuffle=True),
     dataset=dict(
@@ -132,8 +132,8 @@ train_dataloader = dict(
     ),
 )
 val_dataloader = dict(
-    batch_size=2,
-    num_workers=1,
+    batch_size=16,
+    num_workers=8,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
@@ -160,12 +160,12 @@ test_evaluator = val_evaluator
 vis_backends = [
     dict(type="LocalVisBackend"),
     # dict(type='TensorboardVisBackend'),
-    # dict(
-    #     type="WandbVisBackend",
-    #     init_kwargs=dict(
-    #         project="synthetic_finetuning", entity="yonigoz", name="infinity/ViT/base"
-    #     ),
-    # ),
+    dict(
+        type="WandbVisBackend",
+        init_kwargs=dict(
+            project="synthetic_finetuning", entity="yonigoz", name="infinity/ViT/base"
+        ),
+    ),
 ]
 visualizer = dict(
     type="PoseLocalVisualizer", vis_backends=vis_backends, name="visualizer"
@@ -177,5 +177,5 @@ default_hooks = dict(
     param_scheduler=dict(type="ParamSchedulerHook"),
     checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2),
     sampler_seed=dict(type="DistSamplerSeedHook"),
-    visualization=dict(type="PoseVisualizationHook", enable=True, interval=100),
+    visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
 )

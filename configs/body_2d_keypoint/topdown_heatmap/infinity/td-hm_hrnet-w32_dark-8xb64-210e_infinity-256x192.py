@@ -1,7 +1,7 @@
 _base_ = ["../../../_base_/default_runtime.py"]
 
 # runtime
-train_cfg = dict(max_epochs=210, val_interval=1)
+train_cfg = dict(max_epochs=210, val_interval=5)
 
 # optimizer
 optim_wrapper = dict(
@@ -131,8 +131,8 @@ val_pipeline = [
 
 # data loaders
 train_dataloader = dict(
-    batch_size=12,
-    num_workers=2,
+    batch_size=64,
+    num_workers=8,
     persistent_workers=True,
     sampler=dict(type="DefaultSampler", shuffle=True),
     dataset=dict(
@@ -145,8 +145,8 @@ train_dataloader = dict(
     ),
 )
 val_dataloader = dict(
-    batch_size=6,
-    num_workers=2,
+    batch_size=32,
+    num_workers=8,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
@@ -188,14 +188,14 @@ test_evaluator = val_evaluator
 vis_backends = [
     dict(type="LocalVisBackend"),
     # dict(type='TensorboardVisBackend'),
-    # dict(
-    #     type="WandbVisBackend",
-    #     init_kwargs=dict(
-    #         project="synthetic_finetuning",
-    #         entity="yonigoz",
-    #         name="infinity/HRNet/w32_dark",
-    #     ),
-    # ),
+    dict(
+        type="WandbVisBackend",
+        init_kwargs=dict(
+            project="synthetic_finetuning",
+            entity="yonigoz",
+            name="infinity/HRNet/w32_dark",
+        ),
+    ),
 ]
 visualizer = dict(
     type="PoseLocalVisualizer", vis_backends=vis_backends, name="visualizer"
