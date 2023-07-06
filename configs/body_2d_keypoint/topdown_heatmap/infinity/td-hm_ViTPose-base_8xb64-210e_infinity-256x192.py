@@ -2,7 +2,7 @@ _base_ = ["../../../_base_/default_runtime.py"]
 
 resume = False
 # runtime
-train_cfg = dict(max_epochs=210, val_interval=1)
+train_cfg = dict(max_epochs=210, val_interval=5)
 
 # optimizer
 custom_imports = dict(
@@ -179,3 +179,5 @@ default_hooks = dict(
     sampler_seed=dict(type="DistSamplerSeedHook"),
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
 )
+
+work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/infinity/ViT/base"

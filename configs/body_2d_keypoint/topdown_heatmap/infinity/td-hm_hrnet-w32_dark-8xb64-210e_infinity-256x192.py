@@ -209,3 +209,5 @@ default_hooks = dict(
     sampler_seed=dict(type="DistSamplerSeedHook"),
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
 )
+
+work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/infinity/HRNet/w32_dark"
