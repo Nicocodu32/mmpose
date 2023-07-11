@@ -61,14 +61,14 @@ model = dict(
         bgr_to_rgb=True,
     ),
     backbone=dict(
-        type="mmpretrain.VisionTransformer",
+        type="mmcls.VisionTransformer",
         arch="huge",
         img_size=(256, 192),
         patch_size=16,
         qkv_bias=True,
         drop_path_rate=0.55,
         with_cls_token=False,
-        out_type="featmap",
+        output_cls_token=False,
         patch_cfg=dict(padding=2),
         init_cfg=dict(
             type="Pretrained",
