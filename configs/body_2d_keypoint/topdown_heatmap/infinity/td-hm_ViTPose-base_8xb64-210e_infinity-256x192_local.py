@@ -2,7 +2,7 @@ _base_ = ["../../../_base_/default_runtime.py"]
 
 resume = False
 # runtime
-train_cfg = dict(max_epochs=210, val_interval=5)
+train_cfg = dict(max_epochs=210, val_interval=1)
 
 # optimizer
 custom_imports = dict(
@@ -118,8 +118,8 @@ val_pipeline = [
 
 # data loaders
 train_dataloader = dict(
-    batch_size=32,
-    num_workers=8,
+    batch_size=4,
+    num_workers=2,
     persistent_workers=True,
     sampler=dict(type="DefaultSampler", shuffle=True),
     dataset=dict(
@@ -132,8 +132,8 @@ train_dataloader = dict(
     ),
 )
 val_dataloader = dict(
-    batch_size=16,
-    num_workers=8,
+    batch_size=2,
+    num_workers=2,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
@@ -161,13 +161,7 @@ val_evaluator = [
         ann_file=data_root + "/test/annotations.json",
         use_area=False,
     ),
-    dict(
-        type="InfinityAnatomicalMetric",
-        ann_file=data_root + "/test/annotations.json",
-        use_area=False,
-    ),
 ]
-
 test_evaluator = val_evaluator
 
 
@@ -195,4 +189,4 @@ default_hooks = dict(
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
 )
 
-work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/infinity/ViT/base"
+work_dir = "./mmpose_data/work_dirs/infinity/ViT/base"

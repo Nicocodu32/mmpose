@@ -1,29 +1,14 @@
 _base_ = ["../../../_base_/default_runtime.py"]
 
-resume = False
 # runtime
-train_cfg = dict(max_epochs=210, val_interval=5)
+train_cfg = dict(max_epochs=210, val_interval=1)
 
 # optimizer
-custom_imports = dict(
-    imports=["mmpose.engine.optim_wrappers.layer_decay_optim_wrapper"],
-    allow_failed_imports=False,
-)
-
 optim_wrapper = dict(
-    optimizer=dict(type="AdamW", lr=5e-4, betas=(0.9, 0.999), weight_decay=0.1),
-    paramwise_cfg=dict(
-        num_layers=12,
-        layer_decay_rate=0.75,
-        custom_keys={
-            "bias": dict(decay_multi=0.0),
-            "pos_embed": dict(decay_mult=0.0),
-            "relative_position_bias_table": dict(decay_mult=0.0),
-            "norm": dict(decay_mult=0.0),
-        },
-    ),
-    constructor="LayerDecayOptimWrapperConstructor",
-    clip_grad=dict(max_norm=1.0, norm_type=2),
+    optimizer=dict(
+        type="Adam",
+        lr=5e-4,
+    )
 )
 
 # learning policy
@@ -46,11 +31,17 @@ auto_scale_lr = dict(base_batch_size=512)
 
 # hooks
 default_hooks = dict(
-    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=1)
+    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2)
 )
 
 # codec settings
-codec = dict(type="UDPHeatmap", input_size=(192, 256), heatmap_size=(48, 64), sigma=2)
+codec = dict(
+    type="MSRAHeatmap",
+    input_size=(192, 256),
+    heatmap_size=(48, 64),
+    sigma=2,
+    unbiased=True,
+)
 
 # model settings
 model = dict(
@@ -62,41 +53,63 @@ model = dict(
         bgr_to_rgb=True,
     ),
     backbone=dict(
-        type="mmcls.VisionTransformer",
-        arch="base",
-        img_size=(256, 192),
-        patch_size=16,
-        qkv_bias=True,
-        drop_path_rate=0.3,
-        with_cls_token=False,
-        output_cls_token=False,
-        patch_cfg=dict(padding=2),
+        type="HRNet",
+        in_channels=3,
+        extra=dict(
+            stage1=dict(
+                num_modules=1,
+                num_branches=1,
+                block="BOTTLENECK",
+                num_blocks=(4,),
+                num_channels=(64,),
+            ),
+            stage2=dict(
+                num_modules=1,
+                num_branches=2,
+                block="BASIC",
+                num_blocks=(4, 4),
+                num_channels=(32, 64),
+            ),
+            stage3=dict(
+                num_modules=4,
+                num_branches=3,
+                block="BASIC",
+                num_blocks=(4, 4, 4),
+                num_channels=(32, 64, 128),
+            ),
+            stage4=dict(
+                num_modules=3,
+                num_branches=4,
+                block="BASIC",
+                num_blocks=(4, 4, 4, 4),
+                num_channels=(32, 64, 128, 256),
+            ),
+        ),
         init_cfg=dict(
             type="Pretrained",
             checkpoint="https://download.openmmlab.com/mmpose/"
-            "v1/pretrained_models/mae_pretrain_vit_base.pth",
+            "pretrain_models/hrnet_w32-36af842e.pth",
         ),
     ),
     head=dict(
         type="HeatmapHead",
-        in_channels=768,
+        in_channels=32,
         out_channels=53,
-        deconv_out_channels=(256, 256),
-        deconv_kernel_sizes=(4, 4),
+        deconv_out_channels=None,
         loss=dict(type="KeypointMSELoss", use_target_weight=True),
         decoder=codec,
     ),
     test_cfg=dict(
         flip_test=True,
         flip_mode="heatmap",
-        shift_heatmap=False,
+        shift_heatmap=True,
     ),
 )
 
 # base dataset settings
-data_root = "../combined_dataset"
 dataset_type = "InfinityDataset"
 data_mode = "topdown"
+data_root = "../combined_dataset"
 
 # pipelines
 train_pipeline = [
@@ -105,21 +118,21 @@ train_pipeline = [
     dict(type="RandomFlip", direction="horizontal"),
     dict(type="RandomHalfBody"),
     dict(type="RandomBBoxTransform"),
-    dict(type="TopdownAffine", input_size=codec["input_size"], use_udp=True),
+    dict(type="TopdownAffine", input_size=codec["input_size"]),
     dict(type="GenerateTarget", encoder=codec),
     dict(type="PackPoseInputs"),
 ]
 val_pipeline = [
     dict(type="LoadImage"),
     dict(type="GetBBoxCenterScale"),
-    dict(type="TopdownAffine", input_size=codec["input_size"], use_udp=True),
+    dict(type="TopdownAffine", input_size=codec["input_size"]),
     dict(type="PackPoseInputs"),
 ]
 
 # data loaders
 train_dataloader = dict(
-    batch_size=32,
-    num_workers=8,
+    batch_size=6,
+    num_workers=2,
     persistent_workers=True,
     sampler=dict(type="DefaultSampler", shuffle=True),
     dataset=dict(
@@ -132,8 +145,8 @@ train_dataloader = dict(
     ),
 )
 val_dataloader = dict(
-    batch_size=16,
-    num_workers=8,
+    batch_size=3,
+    num_workers=2,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
@@ -170,17 +183,18 @@ val_evaluator = [
 
 test_evaluator = val_evaluator
 
-
 # visualizer
 vis_backends = [
     dict(type="LocalVisBackend"),
     # dict(type='TensorboardVisBackend'),
-    dict(
-        type="WandbVisBackend",
-        init_kwargs=dict(
-            project="synthetic_finetuning", entity="yonigoz", name="infinity/ViT/base"
-        ),
-    ),
+    # dict(
+    #     type="WandbVisBackend",
+    #     init_kwargs=dict(
+    #         project="synthetic_finetuning",
+    #         entity="yonigoz",
+    #         name="infinity/HRNet/w32_dark",
+    #     ),
+    # ),
 ]
 visualizer = dict(
     type="PoseLocalVisualizer", vis_backends=vis_backends, name="visualizer"
@@ -195,4 +209,4 @@ default_hooks = dict(
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
 )
 
-work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/infinity/ViT/base"
+work_dir = "./mmpose_data/work_dirs/infinity/HRNet/w32_dark"

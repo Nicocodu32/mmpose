@@ -1,6 +1,5 @@
 _base_ = ["../../../_base_/default_runtime.py"]
 
-resume = False
 # runtime
 train_cfg = dict(max_epochs=210, val_interval=5)
 
@@ -13,8 +12,8 @@ custom_imports = dict(
 optim_wrapper = dict(
     optimizer=dict(type="AdamW", lr=5e-4, betas=(0.9, 0.999), weight_decay=0.1),
     paramwise_cfg=dict(
-        num_layers=12,
-        layer_decay_rate=0.75,
+        num_layers=32,
+        layer_decay_rate=0.85,
         custom_keys={
             "bias": dict(decay_multi=0.0),
             "pos_embed": dict(decay_mult=0.0),
@@ -62,24 +61,24 @@ model = dict(
         bgr_to_rgb=True,
     ),
     backbone=dict(
-        type="mmcls.VisionTransformer",
-        arch="base",
+        type="mmpretrain.VisionTransformer",
+        arch="huge",
         img_size=(256, 192),
         patch_size=16,
         qkv_bias=True,
-        drop_path_rate=0.3,
+        drop_path_rate=0.55,
         with_cls_token=False,
-        output_cls_token=False,
+        out_type="featmap",
         patch_cfg=dict(padding=2),
         init_cfg=dict(
             type="Pretrained",
             checkpoint="https://download.openmmlab.com/mmpose/"
-            "v1/pretrained_models/mae_pretrain_vit_base.pth",
+            "v1/pretrained_models/mae_pretrain_vit_huge.pth",
         ),
     ),
     head=dict(
         type="HeatmapHead",
-        in_channels=768,
+        in_channels=1280,
         out_channels=53,
         deconv_out_channels=(256, 256),
         deconv_kernel_sizes=(4, 4),
@@ -119,7 +118,7 @@ val_pipeline = [
 # data loaders
 train_dataloader = dict(
     batch_size=32,
-    num_workers=8,
+    num_workers=4,
     persistent_workers=True,
     sampler=dict(type="DefaultSampler", shuffle=True),
     dataset=dict(
@@ -133,7 +132,7 @@ train_dataloader = dict(
 )
 val_dataloader = dict(
     batch_size=16,
-    num_workers=8,
+    num_workers=4,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
@@ -178,7 +177,7 @@ vis_backends = [
     dict(
         type="WandbVisBackend",
         init_kwargs=dict(
-            project="synthetic_finetuning", entity="yonigoz", name="infinity/ViT/base"
+            project="synthetic_finetuning", entity="yonigoz", name="infinity/ViT/huge"
         ),
     ),
 ]
@@ -190,9 +189,9 @@ default_hooks = dict(
     timer=dict(type="IterTimerHook"),
     logger=dict(type="LoggerHook", interval=10),
     param_scheduler=dict(type="ParamSchedulerHook"),
-    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2),
+    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=1),
     sampler_seed=dict(type="DistSamplerSeedHook"),
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
 )
 
-work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/infinity/ViT/base"
+work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/infinity/ViT/huge"

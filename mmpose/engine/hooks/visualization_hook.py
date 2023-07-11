@@ -52,7 +52,7 @@ class PoseVisualizationHook(Hook):
         interval: int = 50,
         kpt_thr: float = 0.3,
         show: bool = False,
-        wait_time: float = 0.,
+        wait_time: float = 0.0,
         out_dir: Optional[str] = None,
         backend_args: Optional[dict] = None,
     ):
@@ -63,10 +63,12 @@ class PoseVisualizationHook(Hook):
         if self.show:
             # No need to think about vis backends.
             self._visualizer._vis_backends = {}
-            warnings.warn('The show is True, it means that only '
-                          'the prediction results are visualized '
-                          'without storing data, so vis_backends '
-                          'needs to be excluded.')
+            warnings.warn(
+                "The show is True, it means that only "
+                "the prediction results are visualized "
+                "without storing data, so vis_backends "
+                "needs to be excluded."
+            )
 
         self.wait_time = wait_time
         self.enable = enable
@@ -74,8 +76,13 @@ class PoseVisualizationHook(Hook):
         self._test_index = 0
         self.backend_args = backend_args
 
-    def after_val_iter(self, runner: Runner, batch_idx: int, data_batch: dict,
-                       outputs: Sequence[PoseDataSample]) -> None:
+    def after_val_iter(
+        self,
+        runner: Runner,
+        batch_idx: int,
+        data_batch: dict,
+        outputs: Sequence[PoseDataSample],
+    ) -> None:
         """Run after every ``self.interval`` validation iterations.
 
         Args:
@@ -94,9 +101,9 @@ class PoseVisualizationHook(Hook):
         total_curr_iter = runner.iter + batch_idx
 
         # Visualize only the first data
-        img_path = data_batch['data_samples'][0].get('img_path')
+        img_path = data_batch["data_samples"][0].get("img_path")
         img_bytes = fileio.get(img_path, backend_args=self.backend_args)
-        img = mmcv.imfrombytes(img_bytes, channel_order='rgb')
+        img = mmcv.imfrombytes(img_bytes, channel_order="rgb")
         data_sample = outputs[0]
 
         # revert the heatmap on the original image
@@ -104,19 +111,25 @@ class PoseVisualizationHook(Hook):
 
         if total_curr_iter % self.interval == 0:
             self._visualizer.add_datasample(
-                os.path.basename(img_path) if self.show else 'val_img',
+                os.path.basename(img_path) if self.show else "val_img",
                 img,
                 data_sample=data_sample,
-                draw_gt=False,
+                draw_gt=True,
                 draw_bbox=True,
                 draw_heatmap=True,
                 show=self.show,
                 wait_time=self.wait_time,
                 kpt_thr=self.kpt_thr,
-                step=total_curr_iter)
+                step=total_curr_iter,
+            )
 
-    def after_test_iter(self, runner: Runner, batch_idx: int, data_batch: dict,
-                        outputs: Sequence[PoseDataSample]) -> None:
+    def after_test_iter(
+        self,
+        runner: Runner,
+        batch_idx: int,
+        data_batch: dict,
+        outputs: Sequence[PoseDataSample],
+    ) -> None:
         """Run after every testing iterations.
 
         Args:
@@ -129,8 +142,7 @@ class PoseVisualizationHook(Hook):
             return
 
         if self.out_dir is not None:
-            self.out_dir = os.path.join(runner.work_dir, runner.timestamp,
-                                        self.out_dir)
+            self.out_dir = os.path.join(runner.work_dir, runner.timestamp, self.out_dir)
             mmengine.mkdir_or_exist(self.out_dir)
 
         self._visualizer.set_dataset_meta(runner.test_evaluator.dataset_meta)
@@ -138,31 +150,34 @@ class PoseVisualizationHook(Hook):
         for data_sample in outputs:
             self._test_index += 1
 
-            img_path = data_sample.get('img_path')
+            img_path = data_sample.get("img_path")
             img_bytes = fileio.get(img_path, backend_args=self.backend_args)
-            img = mmcv.imfrombytes(img_bytes, channel_order='rgb')
+            img = mmcv.imfrombytes(img_bytes, channel_order="rgb")
             data_sample = merge_data_samples([data_sample])
 
             out_file = None
             if self.out_dir is not None:
-                out_file_name, postfix = os.path.basename(img_path).rsplit(
-                    '.', 1)
-                index = len([
-                    fname for fname in os.listdir(self.out_dir)
-                    if fname.startswith(out_file_name)
-                ])
-                out_file = f'{out_file_name}_{index}.{postfix}'
+                out_file_name, postfix = os.path.basename(img_path).rsplit(".", 1)
+                index = len(
+                    [
+                        fname
+                        for fname in os.listdir(self.out_dir)
+                        if fname.startswith(out_file_name)
+                    ]
+                )
+                out_file = f"{out_file_name}_{index}.{postfix}"
                 out_file = os.path.join(self.out_dir, out_file)
 
             self._visualizer.add_datasample(
-                os.path.basename(img_path) if self.show else 'test_img',
+                os.path.basename(img_path) if self.show else "test_img",
                 img,
                 data_sample=data_sample,
                 show=self.show,
-                draw_gt=False,
+                draw_gt=True,
                 draw_bbox=True,
                 draw_heatmap=True,
                 wait_time=self.wait_time,
                 kpt_thr=self.kpt_thr,
                 out_file=out_file,
-                step=self._test_index)
+                step=self._test_index,
+            )

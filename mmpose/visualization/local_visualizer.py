@@ -12,13 +12,14 @@ from mmengine.structures import InstanceData, PixelData
 from mmpose.datasets.datasets.utils import parse_pose_metainfo
 from mmpose.registry import VISUALIZERS
 from mmpose.structures import PoseDataSample
+
 from .opencv_backend_visualizer import OpencvBackendVisualizer
 from .simcc_vis import SimCCVisualizer
 
 
-def _get_adaptive_scales(areas: np.ndarray,
-                         min_area: int = 800,
-                         max_area: int = 30000) -> np.ndarray:
+def _get_adaptive_scales(
+    areas: np.ndarray, min_area: int = 800, max_area: int = 30000
+) -> np.ndarray:
     """Get adaptive scales according to areas.
 
     The scale range is [0.5, 1.0]. When the area is less than
@@ -101,28 +102,30 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
         ...                         pred_pose_data_sample)
     """
 
-    def __init__(self,
-                 name: str = 'visualizer',
-                 image: Optional[np.ndarray] = None,
-                 vis_backends: Optional[Dict] = None,
-                 save_dir: Optional[str] = None,
-                 bbox_color: Optional[Union[str, Tuple[int]]] = 'green',
-                 kpt_color: Optional[Union[str, Tuple[Tuple[int]]]] = 'red',
-                 link_color: Optional[Union[str, Tuple[Tuple[int]]]] = None,
-                 text_color: Optional[Union[str,
-                                            Tuple[int]]] = (255, 255, 255),
-                 skeleton: Optional[Union[List, Tuple]] = None,
-                 line_width: Union[int, float] = 1,
-                 radius: Union[int, float] = 3,
-                 show_keypoint_weight: bool = False,
-                 backend: str = 'opencv',
-                 alpha: float = 1.0):
+    def __init__(
+        self,
+        name: str = "visualizer",
+        image: Optional[np.ndarray] = None,
+        vis_backends: Optional[Dict] = None,
+        save_dir: Optional[str] = None,
+        bbox_color: Optional[Union[str, Tuple[int]]] = "green",
+        kpt_color: Optional[Union[str, Tuple[Tuple[int]]]] = "red",
+        link_color: Optional[Union[str, Tuple[Tuple[int]]]] = None,
+        text_color: Optional[Union[str, Tuple[int]]] = (255, 255, 255),
+        skeleton: Optional[Union[List, Tuple]] = None,
+        line_width: Union[int, float] = 1,
+        radius: Union[int, float] = 3,
+        show_keypoint_weight: bool = False,
+        backend: str = "opencv",
+        alpha: float = 1.0,
+    ):
         super().__init__(
             name=name,
             image=image,
             vis_backends=vis_backends,
             save_dir=save_dir,
-            backend=backend)
+            backend=backend,
+        )
 
         self.bbox_color = bbox_color
         self.kpt_color = kpt_color
@@ -138,35 +141,32 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
         # it will override the default value.
         self.dataset_meta = {}
 
-    def set_dataset_meta(self,
-                         dataset_meta: Dict,
-                         skeleton_style: str = 'mmpose'):
+    def set_dataset_meta(self, dataset_meta: Dict, skeleton_style: str = "mmpose"):
         """Assign dataset_meta to the visualizer. The default visualization
         settings will be overridden.
 
         Args:
             dataset_meta (dict): meta information of dataset.
         """
-        if dataset_meta.get(
-                'dataset_name') == 'coco' and skeleton_style == 'openpose':
+        if dataset_meta.get("dataset_name") == "coco" and skeleton_style == "openpose":
             dataset_meta = parse_pose_metainfo(
-                dict(from_file='configs/_base_/datasets/coco_openpose.py'))
+                dict(from_file="configs/_base_/datasets/coco_openpose.py")
+            )
 
         if isinstance(dataset_meta, dict):
             self.dataset_meta = dataset_meta.copy()
-            self.bbox_color = dataset_meta.get('bbox_color', self.bbox_color)
-            self.kpt_color = dataset_meta.get('keypoint_colors',
-                                              self.kpt_color)
-            self.link_color = dataset_meta.get('skeleton_link_colors',
-                                               self.link_color)
-            self.skeleton = dataset_meta.get('skeleton_links', self.skeleton)
+            self.bbox_color = dataset_meta.get("bbox_color", self.bbox_color)
+            self.kpt_color = dataset_meta.get("keypoint_colors", self.kpt_color)
+            self.link_color = dataset_meta.get("skeleton_link_colors", self.link_color)
+            self.skeleton = dataset_meta.get("skeleton_links", self.skeleton)
         # sometimes self.dataset_meta is manually set, which might be None.
         # it should be converted to a dict at these times
         if self.dataset_meta is None:
             self.dataset_meta = {}
 
-    def _draw_instances_bbox(self, image: np.ndarray,
-                             instances: InstanceData) -> np.ndarray:
+    def _draw_instances_bbox(
+        self, image: np.ndarray, instances: InstanceData
+    ) -> np.ndarray:
         """Draw bounding boxes and corresponding labels of GT or prediction.
 
         Args:
@@ -179,31 +179,29 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
         """
         self.set_image(image)
 
-        if 'bboxes' in instances:
+        if "bboxes" in instances:
             bboxes = instances.bboxes
             self.draw_bboxes(
                 bboxes,
                 edge_colors=self.bbox_color,
                 alpha=self.alpha,
-                line_widths=self.line_width)
+                line_widths=self.line_width,
+            )
         else:
             return self.get_image()
 
-        if 'labels' in instances and self.text_color is not None:
-            classes = self.dataset_meta.get('classes', None)
+        if "labels" in instances and self.text_color is not None:
+            classes = self.dataset_meta.get("classes", None)
             labels = instances.labels
 
             positions = bboxes[:, :2]
-            areas = (bboxes[:, 3] - bboxes[:, 1]) * (
-                bboxes[:, 2] - bboxes[:, 0])
+            areas = (bboxes[:, 3] - bboxes[:, 1]) * (bboxes[:, 2] - bboxes[:, 0])
             scales = _get_adaptive_scales(areas)
 
             for i, (pos, label) in enumerate(zip(positions, labels)):
-                label_text = classes[
-                    label] if classes is not None else f'class {label}'
+                label_text = classes[label] if classes is not None else f"class {label}"
 
-                if isinstance(self.bbox_color,
-                              tuple) and max(self.bbox_color) > 1:
+                if isinstance(self.bbox_color, tuple) and max(self.bbox_color) > 1:
                     facecolor = [c / 255.0 for c in self.bbox_color]
                 else:
                     facecolor = self.bbox_color
@@ -213,22 +211,27 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
                     pos,
                     colors=self.text_color,
                     font_sizes=int(13 * scales[i]),
-                    vertical_alignments='bottom',
-                    bboxes=[{
-                        'facecolor': facecolor,
-                        'alpha': 0.8,
-                        'pad': 0.7,
-                        'edgecolor': 'none'
-                    }])
+                    vertical_alignments="bottom",
+                    bboxes=[
+                        {
+                            "facecolor": facecolor,
+                            "alpha": 0.8,
+                            "pad": 0.7,
+                            "edgecolor": "none",
+                        }
+                    ],
+                )
 
         return self.get_image()
 
-    def _draw_instances_kpts(self,
-                             image: np.ndarray,
-                             instances: InstanceData,
-                             kpt_thr: float = 0.3,
-                             show_kpt_idx: bool = False,
-                             skeleton_style: str = 'mmpose'):
+    def _draw_instances_kpts(
+        self,
+        image: np.ndarray,
+        instances: InstanceData,
+        kpt_thr: float = 0.3,
+        show_kpt_idx: bool = False,
+        skeleton_style: str = "mmpose",
+    ):
         """Draw keypoints and skeletons (optional) of GT or prediction.
 
         Args:
@@ -249,49 +252,45 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
         self.set_image(image)
         img_h, img_w, _ = image.shape
 
-        if 'keypoints' in instances:
-            keypoints = instances.get('transformed_keypoints',
-                                      instances.keypoints)
+        if "keypoints" in instances:
+            keypoints = instances.get("transformed_keypoints", instances.keypoints)
 
-            if 'keypoint_scores' in instances:
+            if "keypoint_scores" in instances:
                 scores = instances.keypoint_scores
             else:
                 scores = np.ones(keypoints.shape[:-1])
 
-            if 'keypoints_visible' in instances:
+            if "keypoints_visible" in instances:
                 keypoints_visible = instances.keypoints_visible
             else:
                 keypoints_visible = np.ones(keypoints.shape[:-1])
 
-            if skeleton_style == 'openpose':
+            if skeleton_style == "openpose":
                 keypoints_info = np.concatenate(
-                    (keypoints, scores[..., None], keypoints_visible[...,
-                                                                     None]),
-                    axis=-1)
+                    (keypoints, scores[..., None], keypoints_visible[..., None]),
+                    axis=-1,
+                )
                 # compute neck joint
                 neck = np.mean(keypoints_info[:, [5, 6]], axis=1)
                 # neck score when visualizing pred
                 neck[:, 2:4] = np.logical_and(
                     keypoints_info[:, 5, 2:4] > kpt_thr,
-                    keypoints_info[:, 6, 2:4] > kpt_thr).astype(int)
-                new_keypoints_info = np.insert(
-                    keypoints_info, 17, neck, axis=1)
+                    keypoints_info[:, 6, 2:4] > kpt_thr,
+                ).astype(int)
+                new_keypoints_info = np.insert(keypoints_info, 17, neck, axis=1)
 
-                mmpose_idx = [
-                    17, 6, 8, 10, 7, 9, 12, 14, 16, 13, 15, 2, 1, 4, 3
-                ]
-                openpose_idx = [
-                    1, 2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17
-                ]
-                new_keypoints_info[:, openpose_idx] = \
-                    new_keypoints_info[:, mmpose_idx]
+                mmpose_idx = [17, 6, 8, 10, 7, 9, 12, 14, 16, 13, 15, 2, 1, 4, 3]
+                openpose_idx = [1, 2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17]
+                new_keypoints_info[:, openpose_idx] = new_keypoints_info[:, mmpose_idx]
                 keypoints_info = new_keypoints_info
 
-                keypoints, scores, keypoints_visible = keypoints_info[
-                    ..., :2], keypoints_info[..., 2], keypoints_info[..., 3]
+                keypoints, scores, keypoints_visible = (
+                    keypoints_info[..., :2],
+                    keypoints_info[..., 2],
+                    keypoints_info[..., 3],
+                )
 
-            for kpts, score, visible in zip(keypoints, scores,
-                                            keypoints_visible):
+            for kpts, score, visible in zip(keypoints, scores, keypoints_visible):
                 kpts = np.array(kpts, copy=False)
 
                 if self.kpt_color is None or isinstance(self.kpt_color, str):
@@ -300,22 +299,23 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
                     kpt_color = self.kpt_color
                 else:
                     raise ValueError(
-                        f'the length of kpt_color '
-                        f'({len(self.kpt_color)}) does not matches '
-                        f'that of keypoints ({len(kpts)})')
+                        f"the length of kpt_color "
+                        f"({len(self.kpt_color)}) does not matches "
+                        f"that of keypoints ({len(kpts)})"
+                    )
 
                 # draw links
                 if self.skeleton is not None and self.link_color is not None:
-                    if self.link_color is None or isinstance(
-                            self.link_color, str):
+                    if self.link_color is None or isinstance(self.link_color, str):
                         link_color = [self.link_color] * len(self.skeleton)
                     elif len(self.link_color) == len(self.skeleton):
                         link_color = self.link_color
                     else:
                         raise ValueError(
-                            f'the length of link_color '
-                            f'({len(self.link_color)}) does not matches '
-                            f'that of skeleton ({len(self.skeleton)})')
+                            f"the length of link_color "
+                            f"({len(self.link_color)}) does not matches "
+                            f"that of skeleton ({len(self.skeleton)})"
+                        )
 
                     for sk_id, sk in enumerate(self.skeleton):
                         pos1 = (int(kpts[sk[0], 0]), int(kpts[sk[0], 1]))
@@ -323,12 +323,19 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
                         if not (visible[sk[0]] and visible[sk[1]]):
                             continue
 
-                        if (pos1[0] <= 0 or pos1[0] >= img_w or pos1[1] <= 0
-                                or pos1[1] >= img_h or pos2[0] <= 0
-                                or pos2[0] >= img_w or pos2[1] <= 0
-                                or pos2[1] >= img_h or score[sk[0]] < kpt_thr
-                                or score[sk[1]] < kpt_thr
-                                or link_color[sk_id] is None):
+                        if (
+                            pos1[0] <= 0
+                            or pos1[0] >= img_w
+                            or pos1[1] <= 0
+                            or pos1[1] >= img_h
+                            or pos2[0] <= 0
+                            or pos2[0] >= img_w
+                            or pos2[1] <= 0
+                            or pos2[1] >= img_h
+                            or score[sk[0]] < kpt_thr
+                            or score[sk[1]] < kpt_thr
+                            or link_color[sk_id] is None
+                        ):
                             # skip the link that should not be drawn
                             continue
                         X = np.array((pos1[0], pos2[0]))
@@ -339,34 +346,41 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
                         transparency = self.alpha
                         if self.show_keypoint_weight:
                             transparency *= max(
-                                0, min(1, 0.5 * (score[sk[0]] + score[sk[1]])))
+                                0, min(1, 0.5 * (score[sk[0]] + score[sk[1]]))
+                            )
 
-                        if skeleton_style == 'openpose':
+                        if skeleton_style == "openpose":
                             mX = np.mean(X)
                             mY = np.mean(Y)
-                            length = ((Y[0] - Y[1])**2 + (X[0] - X[1])**2)**0.5
+                            length = ((Y[0] - Y[1]) ** 2 + (X[0] - X[1]) ** 2) ** 0.5
                             transparency = 0.6
-                            angle = math.degrees(
-                                math.atan2(Y[0] - Y[1], X[0] - X[1]))
+                            angle = math.degrees(math.atan2(Y[0] - Y[1], X[0] - X[1]))
                             polygons = cv2.ellipse2Poly(
                                 (int(mX), int(mY)),
                                 (int(length / 2), int(self.line_width)),
-                                int(angle), 0, 360, 1)
+                                int(angle),
+                                0,
+                                360,
+                                1,
+                            )
 
                             self.draw_polygons(
                                 polygons,
                                 edge_colors=color,
                                 face_colors=color,
-                                alpha=transparency)
+                                alpha=transparency,
+                            )
 
                         else:
-                            self.draw_lines(
-                                X, Y, color, line_widths=self.line_width)
+                            self.draw_lines(X, Y, color, line_widths=self.line_width)
 
                 # draw each point on image
                 for kid, kpt in enumerate(kpts):
-                    if score[kid] < kpt_thr or not visible[
-                            kid] or kpt_color[kid] is None:
+                    if (
+                        score[kid] < kpt_thr
+                        or not visible[kid]
+                        or kpt_color[kid] is None
+                    ):
                         # skip the point that should not be drawn
                         continue
 
@@ -382,7 +396,8 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
                         face_colors=color,
                         edge_colors=color,
                         alpha=transparency,
-                        line_widths=self.radius)
+                        line_widths=self.radius,
+                    )
                     if show_kpt_idx:
                         kpt[0] += self.radius
                         kpt[1] -= self.radius
@@ -391,8 +406,9 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
                             kpt,
                             colors=color,
                             font_sizes=self.radius * 3,
-                            vertical_alignments='bottom',
-                            horizontal_alignments='center')
+                            vertical_alignments="bottom",
+                            horizontal_alignments="center",
+                        )
 
         return self.get_image()
 
@@ -411,7 +427,7 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
         Returns:
             np.ndarray: the drawn image which channel is RGB.
         """
-        if 'heatmaps' not in fields:
+        if "heatmaps" not in fields:
             return None
         heatmaps = fields.heatmaps
         if isinstance(heatmaps, np.ndarray):
@@ -439,33 +455,36 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
         Returns:
             np.ndarray: the drawn image which channel is RGB.
         """
-        if 'heatmaps' not in fields:
+        if "heatmaps" not in fields:
             return None
         heatmaps = fields.heatmaps
         _, h, w = heatmaps.shape
         if isinstance(heatmaps, np.ndarray):
             heatmaps = torch.from_numpy(heatmaps)
         out_image = SimCCVisualizer().draw_instance_xy_heatmap(
-            heatmaps, overlaid_image, n)
+            heatmaps, overlaid_image, n
+        )
         out_image = cv2.resize(out_image[:, :, ::-1], (w, h))
         return out_image
 
     @master_only
-    def add_datasample(self,
-                       name: str,
-                       image: np.ndarray,
-                       data_sample: PoseDataSample,
-                       draw_gt: bool = True,
-                       draw_pred: bool = True,
-                       draw_heatmap: bool = False,
-                       draw_bbox: bool = False,
-                       show_kpt_idx: bool = False,
-                       skeleton_style: str = 'mmpose',
-                       show: bool = False,
-                       wait_time: float = 0,
-                       out_file: Optional[str] = None,
-                       kpt_thr: float = 0.3,
-                       step: int = 0) -> None:
+    def add_datasample(
+        self,
+        name: str,
+        image: np.ndarray,
+        data_sample: PoseDataSample,
+        draw_gt: bool = True,
+        draw_pred: bool = True,
+        draw_heatmap: bool = False,
+        draw_bbox: bool = False,
+        show_kpt_idx: bool = False,
+        skeleton_style: str = "mmpose",
+        show: bool = False,
+        wait_time: float = 0,
+        out_file: Optional[str] = None,
+        kpt_thr: float = 0.3,
+        step: int = 0,
+    ) -> None:
         """Draw datasample and save to all backends.
 
         - If GT and prediction are plotted at the same time, they are
@@ -511,46 +530,59 @@ class PoseLocalVisualizer(OpencvBackendVisualizer):
             gt_img_heatmap = None
 
             # draw bboxes & keypoints
-            if 'gt_instances' in data_sample:
+            if "gt_instances" in data_sample:
                 gt_img_data = self._draw_instances_kpts(
-                    gt_img_data, data_sample.gt_instances, kpt_thr,
-                    show_kpt_idx, skeleton_style)
+                    gt_img_data,
+                    data_sample.gt_instances,
+                    kpt_thr,
+                    show_kpt_idx,
+                    skeleton_style,
+                )
                 if draw_bbox:
                     gt_img_data = self._draw_instances_bbox(
-                        gt_img_data, data_sample.gt_instances)
+                        gt_img_data, data_sample.gt_instances
+                    )
 
             # draw heatmaps
-            if 'gt_fields' in data_sample and draw_heatmap:
+            if "gt_fields" in data_sample and draw_heatmap:
                 gt_img_heatmap = self._draw_instance_heatmap(
-                    data_sample.gt_fields, image)
+                    data_sample.gt_fields, image
+                )
                 if gt_img_heatmap is not None:
-                    gt_img_data = np.concatenate((gt_img_data, gt_img_heatmap),
-                                                 axis=0)
+                    gt_img_data = np.concatenate((gt_img_data, gt_img_heatmap), axis=0)
 
         if draw_pred:
             pred_img_data = image.copy()
             pred_img_heatmap = None
 
             # draw bboxes & keypoints
-            if 'pred_instances' in data_sample:
+            if "pred_instances" in data_sample:
                 pred_img_data = self._draw_instances_kpts(
-                    pred_img_data, data_sample.pred_instances, kpt_thr,
-                    show_kpt_idx, skeleton_style)
+                    pred_img_data,
+                    data_sample.pred_instances,
+                    kpt_thr,
+                    show_kpt_idx,
+                    skeleton_style,
+                )
                 if draw_bbox:
                     pred_img_data = self._draw_instances_bbox(
-                        pred_img_data, data_sample.pred_instances)
+                        pred_img_data, data_sample.pred_instances
+                    )
 
             # draw heatmaps
-            if 'pred_fields' in data_sample and draw_heatmap:
-                if 'keypoint_x_labels' in data_sample.pred_instances:
+            if "pred_fields" in data_sample and draw_heatmap:
+                if "keypoint_x_labels" in data_sample.pred_instances:
                     pred_img_heatmap = self._draw_instance_xy_heatmap(
-                        data_sample.pred_fields, image)
+                        data_sample.pred_fields, image
+                    )
                 else:
                     pred_img_heatmap = self._draw_instance_heatmap(
-                        data_sample.pred_fields, image)
+                        data_sample.pred_fields, image
+                    )
                 if pred_img_heatmap is not None:
                     pred_img_data = np.concatenate(
-                        (pred_img_data, pred_img_heatmap), axis=0)
+                        (pred_img_data, pred_img_heatmap), axis=0
+                    )
 
         # merge visualization results
         if gt_img_data is not None and pred_img_data is not None:
