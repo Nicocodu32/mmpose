@@ -246,3 +246,5 @@ default_hooks = dict(
     sampler_seed=dict(type="DistSamplerSeedHook"),
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
 )
+
+work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_infinity_coco/ViT/base"
