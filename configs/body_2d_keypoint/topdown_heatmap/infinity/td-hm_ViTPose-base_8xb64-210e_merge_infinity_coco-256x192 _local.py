@@ -108,10 +108,10 @@ dataset_infinity = dict(
 )
 dataset_coco = dict(
     type="CocoDataset",
-    data_root="/scratch/users/yonigoz/coco_dataset",
+    data_root="../deep-high-resolution-net.pytorch/data/coco",
     data_mode=data_mode,
-    ann_file="annotations/person_keypoints_train2017.json",
-    data_prefix=dict(img="images/train2017/"),
+    ann_file="annotations/person_keypoints_val2017.json",
+    data_prefix=dict(img="images/val2017/"),
     pipeline=[
         dict(
             type="KeypointConverter",
