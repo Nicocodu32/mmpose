@@ -45,7 +45,7 @@ auto_scale_lr = dict(base_batch_size=512)
 
 # hooks
 default_hooks = dict(
-    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=1)
+    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2)
 )
 
 # codec settings
@@ -131,7 +131,7 @@ train_dataloader = dict(
     ),
 )
 val_dataloader = dict(
-    batch_size=8,
+    batch_size=4,
     num_workers=2,
     persistent_workers=True,
     drop_last=False,
@@ -189,7 +189,7 @@ default_hooks = dict(
     timer=dict(type="IterTimerHook"),
     logger=dict(type="LoggerHook", interval=10),
     param_scheduler=dict(type="ParamSchedulerHook"),
-    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=1),
+    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2),
     sampler_seed=dict(type="DistSamplerSeedHook"),
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
 )
