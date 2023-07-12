@@ -72,8 +72,8 @@ model = dict(
         patch_cfg=dict(padding=2),
         init_cfg=dict(
             type="Pretrained",
-            checkpoint="https://download.openmmlab.com/mmpose/"
-            "v1/pretrained_models/mae_pretrain_vit_base.pth",
+            checkpoint="/scratch/users/yonigoz/mmpose_data/ckpts/vit/"
+            "td-hm_ViTPose-base_8xb64-210e_coco-256x192-216eae50_20230314.pth",
         ),
     ),
     head=dict(
@@ -230,7 +230,7 @@ vis_backends = [
         init_kwargs=dict(
             project="synthetic_finetuning",
             entity="yonigoz",
-            name="merge_infinity_coco/ViT/base",
+            name="merge_infinity_coco/ViT/base_pretrained",
         ),
     ),
 ]
@@ -247,4 +247,4 @@ default_hooks = dict(
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
 )
 
-work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_infinity_coco/ViT/base"
+work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_infinity_coco/ViT/base_pretrained"

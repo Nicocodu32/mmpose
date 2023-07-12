@@ -121,10 +121,10 @@ dataset_infinity = dict(
 )
 dataset_coco = dict(
     type="CocoDataset",
-    data_root="../deep-high-resolution-net.pytorch/data/coco",
+    data_root="/scratch/users/yonigoz/coco_dataset",
     data_mode=data_mode,
-    ann_file="annotations/person_keypoints_val2017.json",
-    data_prefix=dict(img="images/val2017/"),
+    ann_file="annotations/person_keypoints_train2017.json",
+    data_prefix=dict(img="images/train2017/"),
     pipeline=[
         dict(
             type="KeypointConverter",
@@ -181,23 +181,23 @@ combined_dataset = dict(
 
 train_sampler = dict(
     type="MultiSourceSampler",
-    batch_size=12,
+    batch_size=64,
     source_ratio=[1, 3],
     shuffle=True,
 )
 
 # data loaders
 train_dataloader = dict(
-    batch_size=12,
-    num_workers=2,
+    batch_size=64,
+    num_workers=8,
     persistent_workers=True,
     # sampler=dict(type="DefaultSampler", shuffle=True),
     sampler=train_sampler,
     dataset=combined_dataset,
 )
 val_dataloader = dict(
-    batch_size=6,
-    num_workers=2,
+    batch_size=32,
+    num_workers=8,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
@@ -214,9 +214,24 @@ val_dataloader = dict(
 test_dataloader = val_dataloader
 
 # evaluators
-val_evaluator = dict(
-    type="InfinityMetric", ann_file=data_root + "/test/annotations.json", use_area=False
-)
+val_evaluator = [
+    dict(
+        type="InfinityMetric",
+        ann_file=data_root + "/test/annotations.json",
+        use_area=False,
+    ),
+    dict(
+        type="InfinityCocoMetric",
+        ann_file=data_root + "/test/annotations.json",
+        use_area=False,
+    ),
+    dict(
+        type="InfinityAnatomicalMetric",
+        ann_file=data_root + "/test/annotations.json",
+        use_area=False,
+    ),
+]
+
 test_evaluator = val_evaluator
 
 # visualizer
@@ -243,4 +258,8 @@ default_hooks = dict(
     checkpoint=dict(type="CheckpointHook", interval=10),
     sampler_seed=dict(type="DistSamplerSeedHook"),
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
+)
+
+work_dir = (
+    "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_infinity_coco/HRNet/w32_dark"
 )
