@@ -43,11 +43,6 @@ param_scheduler = [
 # automatically scaling LR based on the actual training batch size
 auto_scale_lr = dict(base_batch_size=512)
 
-# hooks
-default_hooks = dict(
-    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2)
-)
-
 # codec settings
 codec = dict(type="UDPHeatmap", input_size=(192, 256), heatmap_size=(48, 64), sigma=2)
 
@@ -118,7 +113,7 @@ val_pipeline = [
 # data loaders
 train_dataloader = dict(
     batch_size=8,
-    num_workers=2,
+    num_workers=1,
     persistent_workers=False,
     sampler=dict(type="DefaultSampler", shuffle=True),
     dataset=dict(
@@ -132,7 +127,7 @@ train_dataloader = dict(
 )
 val_dataloader = dict(
     batch_size=4,
-    num_workers=2,
+    num_workers=1,
     persistent_workers=False,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
