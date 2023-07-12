@@ -1,7 +1,7 @@
 _base_ = ["../../../_base_/default_runtime.py"]
 
 # runtime
-train_cfg = dict(max_epochs=210, val_interval=1)
+train_cfg = dict(max_epochs=210, val_interval=5)
 
 # optimizer
 custom_imports = dict(
@@ -45,7 +45,7 @@ auto_scale_lr = dict(base_batch_size=512)
 
 # hooks
 default_hooks = dict(
-    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=1)
+    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2)
 )
 
 # codec settings
@@ -167,15 +167,15 @@ combined_dataset = dict(
 
 train_sampler = dict(
     type="MultiSourceSampler",
-    batch_size=4,
+    batch_size=32,
     source_ratio=[1, 3],
     shuffle=True,
 )
 
 # data loaders
 train_dataloader = dict(
-    batch_size=4,
-    num_workers=4,
+    batch_size=32,
+    num_workers=8,
     persistent_workers=True,
     # sampler=dict(type="DefaultSampler", shuffle=True),
     sampler=train_sampler,
@@ -183,8 +183,8 @@ train_dataloader = dict(
 )
 
 val_dataloader = dict(
-    batch_size=2,
-    num_workers=4,
+    batch_size=16,
+    num_workers=8,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
@@ -201,9 +201,24 @@ val_dataloader = dict(
 test_dataloader = val_dataloader
 
 # evaluators
-val_evaluator = dict(
-    type="InfinityMetric", ann_file=data_root + "/test/annotations.json", use_area=False
-)
+val_evaluator = [
+    dict(
+        type="InfinityMetric",
+        ann_file=data_root + "/test/annotations.json",
+        use_area=False,
+    ),
+    dict(
+        type="InfinityCocoMetric",
+        ann_file=data_root + "/test/annotations.json",
+        use_area=False,
+    ),
+    dict(
+        type="InfinityAnatomicalMetric",
+        ann_file=data_root + "/test/annotations.json",
+        use_area=False,
+    ),
+]
+
 test_evaluator = val_evaluator
 
 # visualizer
@@ -227,7 +242,7 @@ default_hooks = dict(
     timer=dict(type="IterTimerHook"),
     logger=dict(type="LoggerHook", interval=10),
     param_scheduler=dict(type="ParamSchedulerHook"),
-    checkpoint=dict(type="CheckpointHook", interval=10),
+    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2),
     sampler_seed=dict(type="DistSamplerSeedHook"),
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
 )
