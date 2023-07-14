@@ -89,6 +89,7 @@ model = dict(
             type="Pretrained",
             checkpoint="/scratch/users/yonigoz/mmpose_data/ckpts/hrnet/"
             "td-hm_hrnet-w32_dark-8xb64-210e_coco-256x192-0e00bf12_20220914.pth",
+            prefix="backbone",
         ),
     ),
     head=dict(

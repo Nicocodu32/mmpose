@@ -74,6 +74,7 @@ model = dict(
             type="Pretrained",
             checkpoint="/scratch/users/yonigoz/mmpose_data/ckpts/vit/"
             "td-hm_ViTPose-base_8xb64-210e_coco-256x192-216eae50_20230314.pth",
+            prefix="backbone",
         ),
     ),
     head=dict(
