@@ -178,7 +178,9 @@ vis_backends = [
     dict(
         type="WandbVisBackend",
         init_kwargs=dict(
-            project="synthetic_finetuning", entity="yonigoz", name="infinity/ViT/base"
+            project="synthetic_finetuning",
+            entity="yonigoz",
+            name="infinity/ViT/base_med1",
         ),
     ),
 ]
@@ -195,4 +197,4 @@ default_hooks = dict(
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
 )
 
-work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/infinity/ViT/base"
+work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/infinity/ViT/base_med1"
