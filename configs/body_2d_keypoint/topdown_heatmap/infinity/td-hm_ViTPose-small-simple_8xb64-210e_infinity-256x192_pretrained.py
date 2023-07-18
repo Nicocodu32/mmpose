@@ -133,8 +133,8 @@ train_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file="annotations/person_keypoints_train2017.json",
-        data_prefix=dict(img="train2017/"),
+        ann_file="train/annotations.json",
+        data_prefix=dict(img="train/images/"),
         pipeline=train_pipeline,
     ),
 )
