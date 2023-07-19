@@ -87,8 +87,9 @@ model = dict(
         ),
         init_cfg=dict(
             type="Pretrained",
-            checkpoint="https://download.openmmlab.com/mmpose/"
-            "pretrain_models/hrnet_w32-36af842e.pth",
+            checkpoint="mmpose_data/ckpts/"
+            "td-hm_hrnet-w32_dark-8xb64-210e_coco-256x192-0e00bf12_20220914.pth",
+            prefix="backbone",
         ),
     ),
     head=dict(
@@ -132,7 +133,7 @@ val_pipeline = [
 # data loaders
 train_dataloader = dict(
     batch_size=12,
-    num_workers=2,
+    num_workers=1,
     persistent_workers=True,
     sampler=dict(type="DefaultSampler", shuffle=True),
     dataset=dict(
@@ -144,9 +145,14 @@ train_dataloader = dict(
         pipeline=train_pipeline,
     ),
 )
+
+dataset_type = "InfinityDataset"
+data_mode = "topdown"
+data_root = "../"
+
 val_dataloader = dict(
     batch_size=6,
-    num_workers=2,
+    num_workers=1,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
@@ -154,7 +160,7 @@ val_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file="combined_dataset/test/annotations.json",
+        ann_file="20221018_1_250_batch01hand_zoom_suburb_b_6fps/annotations.json",
         data_prefix=dict(img=""),
         test_mode=True,
         pipeline=val_pipeline,
@@ -166,17 +172,20 @@ test_dataloader = val_dataloader
 val_evaluator = [
     dict(
         type="InfinityMetric",
-        ann_file=data_root + "combined_dataset/test/annotations.json",
+        ann_file=data_root
+        + "20221018_1_250_batch01hand_zoom_suburb_b_6fps/annotations.json",
         use_area=False,
     ),
     dict(
         type="InfinityCocoMetric",
-        ann_file=data_root + "combined_dataset/test/annotations.json",
+        ann_file=data_root
+        + "20221018_1_250_batch01hand_zoom_suburb_b_6fps/annotations.json",
         use_area=False,
     ),
     dict(
         type="InfinityAnatomicalMetric",
-        ann_file=data_root + "combined_dataset/test/annotations.json",
+        ann_file=data_root
+        + "20221018_1_250_batch01hand_zoom_suburb_b_6fps/annotations.json",
         use_area=False,
     ),
 ]
@@ -206,7 +215,7 @@ default_hooks = dict(
     param_scheduler=dict(type="ParamSchedulerHook"),
     checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2),
     sampler_seed=dict(type="DistSamplerSeedHook"),
-    visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
+    visualization=dict(type="PoseVisualizationHook", enable=True, interval=100),
 )
 
-work_dir = "./mmpose_data/work_dirs/infinity/HRNet/w32_dark"
+work_dir = "./mmpose_data/work_dirs/infinity_bedlam/HRNet/w32_dark"

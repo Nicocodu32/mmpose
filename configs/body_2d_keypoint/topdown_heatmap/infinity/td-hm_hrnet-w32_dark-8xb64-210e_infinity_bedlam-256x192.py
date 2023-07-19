@@ -1,7 +1,7 @@
 _base_ = ["../../../_base_/default_runtime.py"]
 
 # runtime
-train_cfg = dict(max_epochs=210, val_interval=1)
+train_cfg = dict(max_epochs=210, val_interval=5)
 
 # optimizer
 optim_wrapper = dict(
@@ -87,8 +87,9 @@ model = dict(
         ),
         init_cfg=dict(
             type="Pretrained",
-            checkpoint="https://download.openmmlab.com/mmpose/"
-            "pretrain_models/hrnet_w32-36af842e.pth",
+            checkpoint="/scratch/users/yonigoz/mmpose_data/ckpts/hrnet/"
+            "td-hm_hrnet-w32_dark-8xb64-210e_coco-256x192-0e00bf12_20220914.pth",
+            prefix="backbone",
         ),
     ),
     head=dict(
@@ -131,8 +132,8 @@ val_pipeline = [
 
 # data loaders
 train_dataloader = dict(
-    batch_size=12,
-    num_workers=2,
+    batch_size=64,
+    num_workers=8,
     persistent_workers=True,
     sampler=dict(type="DefaultSampler", shuffle=True),
     dataset=dict(
@@ -144,9 +145,14 @@ train_dataloader = dict(
         pipeline=train_pipeline,
     ),
 )
+
+dataset_type = "InfinityDataset"
+data_mode = "topdown"
+data_root = "/scratch/users/yonigoz/BEDLAM/data/"
+
 val_dataloader = dict(
-    batch_size=6,
-    num_workers=2,
+    batch_size=64,
+    num_workers=8,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
@@ -154,8 +160,8 @@ val_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file="combined_dataset/test/annotations.json",
-        data_prefix=dict(img=""),
+        ann_file="val_annotations.json",
+        data_prefix=dict(img="eval_images/"),
         test_mode=True,
         pipeline=val_pipeline,
     ),
@@ -166,17 +172,17 @@ test_dataloader = val_dataloader
 val_evaluator = [
     dict(
         type="InfinityMetric",
-        ann_file=data_root + "combined_dataset/test/annotations.json",
+        ann_file=data_root + "/val_annotations.json",
         use_area=False,
     ),
     dict(
         type="InfinityCocoMetric",
-        ann_file=data_root + "combined_dataset/test/annotations.json",
+        ann_file=data_root + "/val_annotations.json",
         use_area=False,
     ),
     dict(
         type="InfinityAnatomicalMetric",
-        ann_file=data_root + "combined_dataset/test/annotations.json",
+        ann_file=data_root + "/val_annotations.json",
         use_area=False,
     ),
 ]
@@ -187,14 +193,14 @@ test_evaluator = val_evaluator
 vis_backends = [
     dict(type="LocalVisBackend"),
     # dict(type='TensorboardVisBackend'),
-    # dict(
-    #     type="WandbVisBackend",
-    #     init_kwargs=dict(
-    #         project="synthetic_finetuning",
-    #         entity="yonigoz",
-    #         name="infinity/HRNet/w32_dark",
-    #     ),
-    # ),
+    dict(
+        type="WandbVisBackend",
+        init_kwargs=dict(
+            project="synthetic_finetuning",
+            entity="yonigoz",
+            name="infinity/HRNet/w32_dark_bedlam",
+        ),
+    ),
 ]
 visualizer = dict(
     type="PoseLocalVisualizer", vis_backends=vis_backends, name="visualizer"
@@ -206,7 +212,7 @@ default_hooks = dict(
     param_scheduler=dict(type="ParamSchedulerHook"),
     checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2),
     sampler_seed=dict(type="DistSamplerSeedHook"),
-    visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
+    visualization=dict(type="PoseVisualizationHook", enable=True, interval=100),
 )
 
-work_dir = "./mmpose_data/work_dirs/infinity/HRNet/w32_dark"
+work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/infinity/HRNet/w32_dark_bedlam"

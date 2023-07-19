@@ -40,7 +40,7 @@ class InfinityDataset(BaseCocoStyleDataset):
 
         for img_id in self.coco.getImgIds():
             img = self.coco.loadImgs(img_id)[0]
-            file_name = img["img_path"].split("/")[-1]
+            file_name = img["img_path"]
             img.update(
                 {
                     "img_id": img_id,
