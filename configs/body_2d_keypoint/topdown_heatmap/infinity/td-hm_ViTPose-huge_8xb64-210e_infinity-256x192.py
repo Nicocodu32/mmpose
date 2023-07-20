@@ -89,7 +89,7 @@ model = dict(
 )
 
 # base dataset settings
-data_root = "../combined_dataset"
+data_root = "../"
 dataset_type = "InfinityDataset"
 data_mode = "topdown"
 
@@ -121,8 +121,8 @@ train_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file="train/annotations.json",
-        data_prefix=dict(img="train/images/"),
+        ann_file="combined_dataset/train/annotations.json",
+        data_prefix=dict(img=""),
         pipeline=train_pipeline,
     ),
 )
@@ -136,8 +136,8 @@ val_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file="test/annotations.json",
-        data_prefix=dict(img="test/images/"),
+        ann_file="combined_dataset/test/annotations.json",
+        data_prefix=dict(img=""),
         test_mode=True,
         pipeline=val_pipeline,
     ),
@@ -148,17 +148,17 @@ test_dataloader = val_dataloader
 val_evaluator = [
     dict(
         type="InfinityMetric",
-        ann_file=data_root + "/test/annotations.json",
+        ann_file=data_root + "combined_dataset/test/annotations.json",
         use_area=False,
     ),
     dict(
         type="InfinityCocoMetric",
-        ann_file=data_root + "/test/annotations.json",
+        ann_file=data_root + "combined_dataset/test/annotations.json",
         use_area=False,
     ),
     dict(
         type="InfinityAnatomicalMetric",
-        ann_file=data_root + "/test/annotations.json",
+        ann_file=data_root + "combined_dataset/test/annotations.json",
         use_area=False,
     ),
 ]
