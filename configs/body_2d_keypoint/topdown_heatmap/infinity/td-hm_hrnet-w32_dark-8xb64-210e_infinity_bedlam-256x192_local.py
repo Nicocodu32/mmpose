@@ -114,7 +114,7 @@ data_root = "../"
 
 # pipelines
 train_pipeline = [
-    dict(type="LoadImage"),
+    dict(type="LoadImage", imdecode_backend="pillow"),
     dict(type="GetBBoxCenterScale"),
     dict(type="RandomFlip", direction="horizontal"),
     dict(type="RandomHalfBody"),
@@ -124,7 +124,7 @@ train_pipeline = [
     dict(type="PackPoseInputs"),
 ]
 val_pipeline = [
-    dict(type="LoadImage"),
+    dict(type="LoadImage", imdecode_backend="pillow"),
     dict(type="GetBBoxCenterScale"),
     dict(type="TopdownAffine", input_size=codec["input_size"]),
     dict(type="PackPoseInputs"),
