@@ -132,7 +132,7 @@ val_pipeline = [
 
 # data loaders
 train_dataloader = dict(
-    batch_size=8,
+    batch_size=64,
     num_workers=0,
     persistent_workers=False,
     sampler=dict(type="DefaultSampler", shuffle=True),
@@ -151,7 +151,7 @@ data_mode = "topdown"
 data_root = "/scratch/users/yonigoz/BEDLAM/data/"
 
 val_dataloader = dict(
-    batch_size=4,
+    batch_size=32,
     num_workers=0,
     persistent_workers=False,
     drop_last=False,
