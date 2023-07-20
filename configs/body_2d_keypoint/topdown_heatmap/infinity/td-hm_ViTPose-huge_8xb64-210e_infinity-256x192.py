@@ -67,8 +67,9 @@ model = dict(
         patch_cfg=dict(padding=2),
         init_cfg=dict(
             type="Pretrained",
-            checkpoint="https://download.openmmlab.com/mmpose/"
-            "v1/pretrained_models/mae_pretrain_vit_huge.pth",
+            checkpoint="/scratch/users/yonigoz/mmpose_data/ckpts/vit/"
+            "td-hm_ViTPose-huge_8xb64-210e_coco-256x192-e32adcd4_20230314.pth",
+            prefix="backbone",
         ),
     ),
     head=dict(
@@ -112,7 +113,7 @@ val_pipeline = [
 
 # data loaders
 train_dataloader = dict(
-    batch_size=4,
+    batch_size=16,
     num_workers=0,
     persistent_workers=False,
     sampler=dict(type="DefaultSampler", shuffle=True),
@@ -126,7 +127,7 @@ train_dataloader = dict(
     ),
 )
 val_dataloader = dict(
-    batch_size=2,
+    batch_size=8,
     num_workers=0,
     persistent_workers=False,
     drop_last=False,
