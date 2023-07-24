@@ -133,7 +133,7 @@ val_pipeline = [
 # data loaders
 train_dataloader = dict(
     batch_size=12,
-    num_workers=1,
+    num_workers=8,
     persistent_workers=True,
     sampler=dict(type="DefaultSampler", shuffle=True),
     dataset=dict(
@@ -152,7 +152,7 @@ data_root = "../"
 
 val_dataloader = dict(
     batch_size=6,
-    num_workers=1,
+    num_workers=8,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
