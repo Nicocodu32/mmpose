@@ -99,29 +99,30 @@ class PoseVisualizationHook(Hook):
         # There is no guarantee that the same batch of images
         # is visualized for each evaluation.
         total_curr_iter = runner.iter + batch_idx
-
-        # Visualize only the first data
-        img_path = data_batch["data_samples"][0].get("img_path")
-        img_bytes = fileio.get(img_path, backend_args=self.backend_args)
-        img = mmcv.imfrombytes(img_bytes, channel_order="rgb")
-        data_sample = outputs[0]
-
-        # revert the heatmap on the original image
-        data_sample = merge_data_samples([data_sample])
-
         if total_curr_iter % self.interval == 0:
-            self._visualizer.add_datasample(
-                os.path.basename(img_path) if self.show else "val_img",
-                img,
-                data_sample=data_sample,
-                draw_gt=True,
-                draw_bbox=True,
-                draw_heatmap=True,
-                show=self.show,
-                wait_time=self.wait_time,
-                kpt_thr=self.kpt_thr,
-                step=total_curr_iter,
-            )
+            # Visualize only the first data
+            # img_path = data_batch["data_samples"][0].get("img_path")
+            for i in range(len(data_batch["data_samples"])):
+                img_path = data_batch["data_samples"][i].get("img_path")
+                img_bytes = fileio.get(img_path, backend_args=self.backend_args)
+                img = mmcv.imfrombytes(img_bytes, channel_order="rgb")
+                data_sample = outputs[i]
+
+                # revert the heatmap on the original image
+                data_sample = merge_data_samples([data_sample])
+
+                self._visualizer.add_datasample(
+                    os.path.basename(img_path) if self.show else "val_img",
+                    img,
+                    data_sample=data_sample,
+                    draw_gt=True,
+                    draw_bbox=True,
+                    draw_heatmap=True,
+                    show=self.show,
+                    wait_time=self.wait_time,
+                    kpt_thr=self.kpt_thr,
+                    step=total_curr_iter,
+                )
 
     def after_test_iter(
         self,
