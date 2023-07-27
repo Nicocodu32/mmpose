@@ -102,7 +102,7 @@ class PoseVisualizationHook(Hook):
         total_curr_iter = runner.iter + batch_idx
         if total_curr_iter % self.interval == 0:
             # Visualize only the first data
-            if self.show_all_batch:
+            if not self.show_all_batch:
                 img_path = data_batch["data_samples"][0].get("img_path")
                 img_bytes = fileio.get(img_path, backend_args=self.backend_args)
                 img = mmcv.imfrombytes(img_bytes, channel_order="rgb")
