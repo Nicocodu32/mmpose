@@ -1,7 +1,7 @@
 _base_ = ["../../../_base_/default_runtime.py"]
 
 # runtime
-train_cfg = dict(max_epochs=210, val_interval=5)
+train_cfg = dict(max_epochs=30, val_interval=3)
 
 # optimizer
 custom_imports = dict(
@@ -12,8 +12,8 @@ custom_imports = dict(
 optim_wrapper = dict(
     optimizer=dict(type="AdamW", lr=5e-4, betas=(0.9, 0.999), weight_decay=0.1),
     paramwise_cfg=dict(
-        num_layers=32,
-        layer_decay_rate=0.85,
+        num_layers=12,
+        layer_decay_rate=0.75,
         custom_keys={
             "bias": dict(decay_multi=0.0),
             "pos_embed": dict(decay_mult=0.0),
@@ -33,8 +33,8 @@ param_scheduler = [
     dict(
         type="MultiStepLR",
         begin=0,
-        end=210,
-        milestones=[170, 200],
+        end=30,
+        milestones=[24, 27],
         gamma=0.1,
         by_epoch=True,
     ),
@@ -42,6 +42,11 @@ param_scheduler = [
 
 # automatically scaling LR based on the actual training batch size
 auto_scale_lr = dict(base_batch_size=512)
+
+# hooks
+default_hooks = dict(
+    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2)
+)
 
 # codec settings
 codec = dict(type="UDPHeatmap", input_size=(192, 256), heatmap_size=(48, 64), sigma=2)
@@ -57,24 +62,24 @@ model = dict(
     ),
     backbone=dict(
         type="mmcls.VisionTransformer",
-        arch="huge",
+        arch="base",
         img_size=(256, 192),
         patch_size=16,
         qkv_bias=True,
-        drop_path_rate=0.55,
+        drop_path_rate=0.3,
         with_cls_token=False,
         output_cls_token=False,
         patch_cfg=dict(padding=2),
         init_cfg=dict(
             type="Pretrained",
             checkpoint="/scratch/users/yonigoz/mmpose_data/ckpts/vit/"
-            "td-hm_ViTPose-huge_8xb64-210e_coco-256x192-e32adcd4_20230314.pth",
+            "td-hm_ViTPose-base_8xb64-210e_coco-256x192-216eae50_20230314.pth",
             prefix="backbone",
         ),
     ),
     head=dict(
         type="HeatmapHead",
-        in_channels=1280,
+        in_channels=768,
         out_channels=53,
         deconv_out_channels=(256, 256),
         deconv_kernel_sizes=(4, 4),
@@ -88,6 +93,33 @@ model = dict(
     ),
 )
 
+
+# base dataset settings
+dataset_type = "InfinityDataset"
+data_mode = "topdown"
+data_root = "/scratch/users/yonigoz/infinity_datasets/"
+
+dataset_infinity = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file="combined_dataset_15fps/train/annotations.json",
+    data_prefix=dict(img=""),
+    pipeline=[],
+)
+
+dataset_type = "InfinityDataset"
+data_mode = "topdown"
+data_root = "/scratch/users/yonigoz/BEDLAM/data/"
+
+dataset_bedlam = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file="train_annotations.json",
+    data_prefix=dict(img="training_images/"),
+    pipeline=[],
+)
 
 # pipelines
 train_pipeline = [
@@ -107,38 +139,46 @@ val_pipeline = [
     dict(type="PackPoseInputs"),
 ]
 
-# base dataset settings
-data_root = "../"
-dataset_type = "InfinityDataset"
-data_mode = "topdown"
+combined_dataset = dict(
+    type="CombinedDataset",
+    metainfo=dict(from_file="configs/_base_/datasets/infinity.py"),
+    datasets=[dataset_infinity, dataset_bedlam],
+    pipeline=train_pipeline,
+    test_mode=False,
+)
 
+train_sampler = dict(
+    type="MultiSourceSampler",
+    batch_size=32,
+    source_ratio=[1, 2],
+    shuffle=True,
+)
 
 # data loaders
 train_dataloader = dict(
-    batch_size=8,
-    num_workers=0,
-    persistent_workers=False,
-    sampler=dict(type="DefaultSampler", shuffle=True),
-    dataset=dict(
-        type=dataset_type,
-        data_root=data_root,
-        data_mode=data_mode,
-        ann_file="combined_dataset/train/annotations.json",
-        data_prefix=dict(img=""),
-        pipeline=train_pipeline,
-    ),
+    batch_size=32,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=train_sampler,
+    dataset=combined_dataset,
 )
+
+dataset_type = "InfinityDataset"
+data_mode = "topdown"
+data_root = "/scratch/users/yonigoz/RICH/full_test/"
+
+
 val_dataloader = dict(
-    batch_size=4,
-    num_workers=0,
-    persistent_workers=False,
+    batch_size=16,
+    num_workers=4,
+    persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file="combined_dataset/test/annotations.json",
+        ann_file="val_annotations.json",
         data_prefix=dict(img=""),
         test_mode=True,
         pipeline=val_pipeline,
@@ -150,23 +190,22 @@ test_dataloader = val_dataloader
 val_evaluator = [
     dict(
         type="InfinityMetric",
-        ann_file=data_root + "combined_dataset/test/annotations.json",
+        ann_file=data_root + "val_annotations.json",
         use_area=False,
     ),
     dict(
         type="InfinityCocoMetric",
-        ann_file=data_root + "combined_dataset/test/annotations.json",
+        ann_file=data_root + "val_annotations.json",
         use_area=False,
     ),
     dict(
         type="InfinityAnatomicalMetric",
-        ann_file=data_root + "combined_dataset/test/annotations.json",
+        ann_file=data_root + "val_annotations.json",
         use_area=False,
     ),
 ]
 
 test_evaluator = val_evaluator
-
 
 # visualizer
 vis_backends = [
@@ -175,7 +214,9 @@ vis_backends = [
     dict(
         type="WandbVisBackend",
         init_kwargs=dict(
-            project="synthetic_finetuning", entity="yonigoz", name="infinity/ViT/huge"
+            project="synthetic_finetuning",
+            entity="yonigoz",
+            name="merge_bedlam_infinity_eval_rich/ViT/base_pretrained",
         ),
     ),
 ]
@@ -189,7 +230,7 @@ default_hooks = dict(
     param_scheduler=dict(type="ParamSchedulerHook"),
     checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2),
     sampler_seed=dict(type="DistSamplerSeedHook"),
-    visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
+    visualization=dict(type="PoseVisualizationHook", enable=True, interval=200),
 )
 
-work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/infinity/ViT/huge"
+work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_bedlam_infinity_eval_rich/ViT/base_pretrained"
