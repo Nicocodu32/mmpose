@@ -52,6 +52,7 @@ class PoseVisualizationHook(Hook):
         interval: int = 50,
         kpt_thr: float = 0.3,
         show: bool = False,
+        show_all_batch=False,
         wait_time: float = 0.0,
         out_dir: Optional[str] = None,
         backend_args: Optional[dict] = None,
@@ -69,7 +70,7 @@ class PoseVisualizationHook(Hook):
                 "without storing data, so vis_backends "
                 "needs to be excluded."
             )
-
+        self.show_all_batch = show_all_batch
         self.wait_time = wait_time
         self.enable = enable
         self.out_dir = out_dir
@@ -101,12 +102,11 @@ class PoseVisualizationHook(Hook):
         total_curr_iter = runner.iter + batch_idx
         if total_curr_iter % self.interval == 0:
             # Visualize only the first data
-            # img_path = data_batch["data_samples"][0].get("img_path")
-            for i in range(len(data_batch["data_samples"])):
-                img_path = data_batch["data_samples"][i].get("img_path")
+            if self.show_all_batch:
+                img_path = data_batch["data_samples"][0].get("img_path")
                 img_bytes = fileio.get(img_path, backend_args=self.backend_args)
                 img = mmcv.imfrombytes(img_bytes, channel_order="rgb")
-                data_sample = outputs[i]
+                data_sample = outputs[0]
 
                 # revert the heatmap on the original image
                 data_sample = merge_data_samples([data_sample])
@@ -123,6 +123,28 @@ class PoseVisualizationHook(Hook):
                     kpt_thr=self.kpt_thr,
                     step=total_curr_iter,
                 )
+            else:
+                for i in range(len(data_batch["data_samples"])):
+                    img_path = data_batch["data_samples"][i].get("img_path")
+                    img_bytes = fileio.get(img_path, backend_args=self.backend_args)
+                    img = mmcv.imfrombytes(img_bytes, channel_order="rgb")
+                    data_sample = outputs[i]
+
+                    # revert the heatmap on the original image
+                    data_sample = merge_data_samples([data_sample])
+
+                    self._visualizer.add_datasample(
+                        os.path.basename(img_path) if self.show else "val_img",
+                        img,
+                        data_sample=data_sample,
+                        draw_gt=True,
+                        draw_bbox=True,
+                        draw_heatmap=True,
+                        show=self.show,
+                        wait_time=self.wait_time,
+                        kpt_thr=self.kpt_thr,
+                        step=total_curr_iter,
+                    )
 
     def after_test_iter(
         self,
