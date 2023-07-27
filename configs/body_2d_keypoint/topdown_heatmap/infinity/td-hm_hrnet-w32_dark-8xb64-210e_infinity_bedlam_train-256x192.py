@@ -175,7 +175,7 @@ dataset_bedlam = dict(
 combined_dataset = dict(
     type="CombinedDataset",
     metainfo=dict(from_file="configs/_base_/datasets/infinity.py"),
-    datasets=[dataset_infinity, dataset_bedlam],
+    datasets=[dataset_bedlam, dataset_infinity],
     pipeline=val_pipeline,
     test_mode=False,
 )
@@ -183,7 +183,7 @@ combined_dataset = dict(
 val_sampler = dict(
     type="MultiSourceSampler",
     batch_size=32,
-    source_ratio=[1, 2],
+    source_ratio=[2, 1],
     shuffle=True,
 )
 
