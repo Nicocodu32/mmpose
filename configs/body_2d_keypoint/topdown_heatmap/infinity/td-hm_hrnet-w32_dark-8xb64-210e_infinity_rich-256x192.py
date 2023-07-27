@@ -1,7 +1,7 @@
 _base_ = ["../../../_base_/default_runtime.py"]
 
 # runtime
-train_cfg = dict(max_epochs=210, val_interval=1)
+train_cfg = dict(max_epochs=210, val_interval=20)
 
 # optimizer
 optim_wrapper = dict(
@@ -212,7 +212,7 @@ default_hooks = dict(
     param_scheduler=dict(type="ParamSchedulerHook"),
     checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2),
     sampler_seed=dict(type="DistSamplerSeedHook"),
-    visualization=dict(type="PoseVisualizationHook", enable=True, interval=10),
+    visualization=dict(type="PoseVisualizationHook", enable=True, interval=200),
 )
 
 work_dir = (
