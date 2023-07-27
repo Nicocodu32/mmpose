@@ -183,7 +183,7 @@ combined_dataset = dict(
 val_sampler = dict(
     type="MultiSourceSampler",
     batch_size=32,
-    source_ratio=[1, 3],
+    source_ratio=[1, 2],
     shuffle=True,
 )
 
