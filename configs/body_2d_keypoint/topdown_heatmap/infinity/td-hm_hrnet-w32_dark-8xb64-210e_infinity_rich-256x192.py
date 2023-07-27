@@ -148,7 +148,7 @@ train_dataloader = dict(
 
 dataset_type = "InfinityDataset"
 data_mode = "topdown"
-data_root = "/scratch/users/yonigoz/RICH/full_dataset/"
+data_root = "/scratch/users/yonigoz/RICH/full_test/"
 
 val_dataloader = dict(
     batch_size=32,
