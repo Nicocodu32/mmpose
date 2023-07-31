@@ -182,6 +182,27 @@ val_dataloader = dict(
 )
 test_dataloader = val_dataloader
 
+# evaluators
+val_evaluator = [
+    dict(
+        type="InfinityMetric",
+        ann_file=data_root + "val_annotations.json",
+        use_area=False,
+    ),
+    dict(
+        type="InfinityCocoMetric",
+        ann_file=data_root + "val_annotations.json",
+        use_area=False,
+    ),
+    dict(
+        type="InfinityAnatomicalMetric",
+        ann_file=data_root + "val_annotations.json",
+        use_area=False,
+    ),
+]
+
+test_evaluator = val_evaluator
+
 
 # visualizer
 vis_backends = [
