@@ -20,7 +20,7 @@ param_scheduler = [
         type="MultiStepLR",
         begin=0,
         end=30,
-        milestones=[24, 28],
+        milestones=[14, 20],
         gamma=0.1,
         by_epoch=True,
     ),
