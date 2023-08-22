@@ -510,7 +510,7 @@ class InfinityAnatomicalMetric(CocoMetric):
             pred["keypoints"] = keypoints
             keypoint_scores = keypoint_scores[:, 17:]
             pred["keypoint_scores"] = keypoint_scores
-            pred["category_id"] = data_sample.get("category_id", 1)
+            pred["category_id"] = data_sample.get("category_id", 0)
 
             if "bbox_scores" in data_sample["pred_instances"]:
                 # some one-stage models will predict bboxes and scores
