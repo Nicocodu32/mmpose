@@ -152,6 +152,7 @@ val_pipeline = [
     dict(type="TopdownAffine", input_size=codec["input_size"]),
     dict(type="PackPoseInputs"),
 ]
+test_pipeline = val_pipeline
 
 combined_dataset = dict(
     type="CombinedDataset",

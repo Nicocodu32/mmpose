@@ -20,8 +20,8 @@ from mmpose.registry import VISUALIZERS
 from mmpose.structures import merge_data_samples, split_instances
 from mmpose.utils import adapt_mmdet_pipeline
 
-DET_CONFIG = "demo/mmdetection_cfg/configs/convnext/cascade-mask-rcnn_convnext-t-p4-w7_fpn_4conv1fc-giou_amp-ms-crop-3x_coco.py"
-DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/convnext/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco_20220509_204200-8f07c40b.pth"
+# DET_CONFIG = "demo/mmdetection_cfg/configs/convnext/cascade-mask-rcnn_convnext-t-p4-w7_fpn_4conv1fc-giou_amp-ms-crop-3x_coco.py"
+# DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/convnext/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco_20220509_204200-8f07c40b.pth"
 
 # DET_CONFIG = "demo/mmdetection_cfg/configs/yolo/yolov3_d53_8xb8-ms-608-273e_coco"
 # DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/retinanet/retinanet_r50_fpn_1x_coco/retinanet_r50_fpn_1x_coco_20200130-c2398f9e.pth"
@@ -29,16 +29,20 @@ DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/convnext/casca
 # DET_CONFIG = "demo/mmdetection_cfg/mask_rcnn_r50_fpn_2x_coco.py"
 # DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_2x_coco/faster_rcnn_r50_fpn_2x_coco_bbox_mAP-0.384_20200504_210434-a5d8aa15.pth"
 
+DET_CONFIG = "demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py"
+DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth"
 
 # DET_CONFIG = "demo/mmdetection_cfg/yolov3_d53_320_273e_coco.py"
 # DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/yolo/yolov3_d53_320_273e_coco/yolov3_d53_320_273e_coco-421362b6.pth"
 
 POSE_CONFIG = "configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_hrnet-w48_dark-8xb32-210e_merge_bedlam_infinity_eval_rich-384x288_pretrained.py"
-POSE_CHECKPOINT = "pretrain/hrnet/best_infinity_AP_epoch_24.pth"
+POSE_CHECKPOINT = "pretrain/hrnet/best_infinity_AP_epoch_18.pth"
 
+# POSE_CONFIG = "configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_ViTPose-huge_8xb64-210e_merge_bedlam_infinity_eval_rich-256x192.py"
+# POSE_CHECKPOINT = "pretrain/vit/best_infinity_AP_epoch_4.pth"
 
 OPENCAP_ROOT = "../OpenCap/data"
-OUTPUT_ROOT = "eval_opencap_output"
+OUTPUT_ROOT = "eval_opencap_output_hrnet_18e"
 
 BBOX_THR = 0.3
 NMS_THR = 0.3
@@ -48,9 +52,11 @@ KPT_THR = 0.3
 try:
     from mmdet.apis import inference_detector, init_detector
 
+    print("success")
     has_mmdet = True
 except (ImportError, ModuleNotFoundError):
     has_mmdet = False
+    print("failed")
 
 
 def process_one_image(img, detector, pose_estimator, visualizer=None, show_interval=0):
@@ -76,6 +82,7 @@ def process_one_image(img, detector, pose_estimator, visualizer=None, show_inter
         ][None, :]
 
     # predict keypoints
+    torch.cuda.empty_cache()
     pose_results = inference_topdown(pose_estimator, img, bboxes)
     data_samples = merge_data_samples(pose_results)
 
@@ -84,7 +91,7 @@ def process_one_image(img, detector, pose_estimator, visualizer=None, show_inter
         img = mmcv.imread(img, channel_order="rgb")
     elif isinstance(img, np.ndarray):
         img = mmcv.bgr2rgb(img)
-
+    print("data_samples", data_samples)
     if visualizer is not None:
         visualizer.add_datasample(
             "result",

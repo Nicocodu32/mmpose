@@ -7,6 +7,7 @@ from mmengine.dataset import BaseDataset
 from mmengine.registry import build_from_cfg
 
 from mmpose.registry import DATASETS
+
 from .datasets.utils import parse_pose_metainfo
 
 
@@ -20,12 +21,13 @@ class CombinedDataset(BaseDataset):
         pipeline (list, optional): Processing pipeline. Defaults to [].
     """
 
-    def __init__(self,
-                 metainfo: dict,
-                 datasets: list,
-                 pipeline: List[Union[dict, Callable]] = [],
-                 **kwargs):
-
+    def __init__(
+        self,
+        metainfo: dict,
+        datasets: list,
+        pipeline: List[Union[dict, Callable]] = [],
+        **kwargs,
+    ):
         self.datasets = []
 
         for cfg in datasets:
@@ -61,8 +63,9 @@ class CombinedDataset(BaseDataset):
         """
         if index >= len(self) or index < -len(self):
             raise ValueError(
-                f'index({index}) is out of bounds for dataset with '
-                f'length({len(self)}).')
+                f"index({index}) is out of bounds for dataset with "
+                f"length({len(self)})."
+            )
 
         if index < 0:
             index = index + len(self)
@@ -102,12 +105,17 @@ class CombinedDataset(BaseDataset):
 
         # Add metainfo items that are required in the pipeline and the model
         metainfo_keys = [
-            'upper_body_ids', 'lower_body_ids', 'flip_pairs',
-            'dataset_keypoint_weights', 'flip_indices'
+            "upper_body_ids",
+            "lower_body_ids",
+            "flip_pairs",
+            "dataset_keypoint_weights",
+            "flip_indices",
         ]
 
         for key in metainfo_keys:
             data_info[key] = deepcopy(self._metainfo[key])
+
+        print("flip_pairs", data_info["flip_pairs"])
 
         return data_info
 
