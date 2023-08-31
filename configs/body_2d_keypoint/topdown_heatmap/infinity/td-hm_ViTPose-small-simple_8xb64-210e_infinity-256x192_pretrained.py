@@ -86,7 +86,7 @@ model = dict(
     head=dict(
         type="HeatmapHead",
         in_channels=384,
-        out_channels=53,
+        out_channels=68,
         deconv_out_channels=[],
         deconv_kernel_sizes=[],
         final_layer=dict(kernel_size=3, padding=1),

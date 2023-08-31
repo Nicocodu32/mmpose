@@ -485,7 +485,7 @@ class InfinityAnatomicalMetric(CocoMetric):
                 - 'pred_instances': The prediction results of instance(s)
         """
         self.dataset_meta = deepcopy(self.dataset_meta)
-        self.dataset_meta["num_keypoints"] = 36
+        self.dataset_meta["num_keypoints"] = 51
         for data_sample in data_samples:
             if "pred_instances" not in data_sample:
                 raise ValueError(
@@ -510,7 +510,7 @@ class InfinityAnatomicalMetric(CocoMetric):
             pred["keypoints"] = keypoints
             keypoint_scores = keypoint_scores[:, 17:]
             pred["keypoint_scores"] = keypoint_scores
-            pred["category_id"] = data_sample.get("category_id", 0)
+            pred["category_id"] = data_sample.get("category_id", 1)
 
             if "bbox_scores" in data_sample["pred_instances"]:
                 # some one-stage models will predict bboxes and scores
