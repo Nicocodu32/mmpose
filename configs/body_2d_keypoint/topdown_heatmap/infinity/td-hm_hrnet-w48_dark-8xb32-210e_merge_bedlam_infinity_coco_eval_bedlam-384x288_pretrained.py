@@ -149,7 +149,7 @@ dataset_coco = dict(
     pipeline=[
         dict(
             type="KeypointConverter",
-            num_keypoints=53,
+            num_keypoints=68,
             mapping=[
                 (0, 0),
                 (1, 1),
