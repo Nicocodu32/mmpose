@@ -115,8 +115,6 @@ class CombinedDataset(BaseDataset):
         for key in metainfo_keys:
             data_info[key] = deepcopy(self._metainfo[key])
 
-        print("flip_pairs", data_info["flip_pairs"])
-
         return data_info
 
     def full_init(self):
