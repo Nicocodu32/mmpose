@@ -208,11 +208,10 @@ dataset_coco = dict(
     data_mode=data_mode,
     ann_file="annotations/person_keypoints_train2017.json",
     data_prefix=dict(img="images/train2017/"),
-    used_data_keys=used_data_keys,
     pipeline=[
         dict(
             type="KeypointConverter",
-            num_keypoints=68,
+            num_keypoints=len(used_data_keys),
             mapping=[
                 (0, 0),
                 (1, 1),
