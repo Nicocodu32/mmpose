@@ -174,21 +174,57 @@ val_pipeline = [
     dict(type="PackPoseInputs"),
 ]
 
+dataset_type = "InfinityDataset"
+data_mode = "topdown"
+data_root = "../"
+
+dataset_infinity = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file="combined_dataset_15fps/train/annotations.json",
+    data_prefix=dict(img=""),
+    pipeline=[],
+    used_data_keys=used_data_keys,
+)
+
+dataset_type = "InfinityDataset"
+data_mode = "topdown"
+data_root = "../"
+
+dataset_infinity2 = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file="combined_dataset_15fps/test/annotations.json",
+    data_prefix=dict(img=""),
+    pipeline=[],
+    used_data_keys=used_data_keys,
+)
+
+combined_dataset = dict(
+    type="CombinedDataset",
+    metainfo=dict(from_file="configs/_base_/datasets/infinity.py"),
+    datasets=[dataset_infinity, dataset_infinity2],
+    pipeline=train_pipeline,
+    test_mode=False,
+)
+
+train_sampler = dict(
+    type="MultiSourceSampler",
+    batch_size=32,
+    source_ratio=[1, 1],
+    shuffle=True,
+)
+
+
 # data loaders
 train_dataloader = dict(
     batch_size=12,
     num_workers=8,
     persistent_workers=True,
-    sampler=dict(type="DefaultSampler", shuffle=True),
-    dataset=dict(
-        type=dataset_type,
-        data_root=data_root,
-        data_mode=data_mode,
-        ann_file="combined_dataset_15fps/train/annotations.json",
-        data_prefix=dict(img=""),
-        pipeline=train_pipeline,
-        used_data_keys=used_data_keys,
-    ),
+    sampler=train_sampler,
+    dataset=combined_dataset
 )
 
 dataset_type = "InfinityDataset"

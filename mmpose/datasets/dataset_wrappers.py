@@ -88,6 +88,7 @@ class CombinedDataset(BaseDataset):
         """
 
         data_info = self.get_data_info(idx)
+        # print("data_info: ", data_info)
 
         return self.pipeline(data_info)
 
@@ -105,11 +106,11 @@ class CombinedDataset(BaseDataset):
 
         # Add metainfo items that are required in the pipeline and the model
         metainfo_keys = [
-            "upper_body_ids",
-            "lower_body_ids",
-            "flip_pairs",
-            "dataset_keypoint_weights",
-            "flip_indices",
+            # "upper_body_ids",
+            # "lower_body_ids",
+            # "flip_pairs",
+            # "dataset_keypoint_weights",
+            # "flip_indices",
         ]
 
         for key in metainfo_keys:
