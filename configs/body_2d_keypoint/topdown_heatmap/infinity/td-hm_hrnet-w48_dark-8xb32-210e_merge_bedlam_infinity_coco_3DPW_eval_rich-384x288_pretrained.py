@@ -257,7 +257,8 @@ test_pipeline = val_pipeline
 combined_dataset = dict(
     type="CombinedDataset",
     metainfo=dict(from_file="configs/_base_/datasets/infinity.py"),
-    datasets=[dataset_infinity, dataset_bedlam, dataset_3DPW, dataset_coco],
+    # datasets=[dataset_infinity, dataset_bedlam, dataset_3DPW, dataset_coco],
+    datasets=[dataset_infinity, dataset_bedlam, dataset_3DPW],
     pipeline=train_pipeline,
     test_mode=False,
 )
@@ -265,7 +266,8 @@ combined_dataset = dict(
 train_sampler = dict(
     type="MultiSourceSampler",
     batch_size=32,
-    source_ratio=[1, 1, 1, 1],
+    # source_ratio=[1, 1, 1, 1],
+    source_ratio=[1, 1, 1],
     shuffle=True,
 )
 
