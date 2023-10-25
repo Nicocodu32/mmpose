@@ -282,7 +282,7 @@ train_dataloader = dict(
 
 dataset_type = "InfinityDataset"
 data_mode = "topdown"
-data_root = "/scratch/users/yonigoz/BEDLAM/data/"
+data_root = "/scratch/users/yonigoz/RICH/full_test/downsampled/"
 
 val_dataloader = dict(
     batch_size=32,
@@ -295,7 +295,7 @@ val_dataloader = dict(
         data_root=data_root,
         data_mode=data_mode,
         ann_file="val_annotations.json",
-        data_prefix=dict(img="eval_images/"),
+        data_prefix=dict(img=""),
         test_mode=True,
         pipeline=val_pipeline,
         used_data_keys=used_data_keys,
