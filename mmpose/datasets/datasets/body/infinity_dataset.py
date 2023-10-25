@@ -6,6 +6,7 @@ from itertools import filterfalse, groupby
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
+from mmengine import Config
 from mmengine.dataset import BaseDataset, force_full_init
 from mmengine.fileio import exists, get_local_path, load
 from mmengine.utils import is_list_of
@@ -22,6 +23,59 @@ from ..utils import parse_pose_metainfo
 @DATASETS.register_module(name="InfinityDataset")
 class InfinityDataset(BaseCocoStyleDataset):
     METAINFO: dict = dict(from_file="configs/_base_/datasets/infinity.py")
+    def __init__(self,
+                 ann_file: str = '',
+                 bbox_file: Optional[str] = None,
+                 data_mode: str = 'topdown',
+                 metainfo: Optional[dict] = None,
+                 data_root: Optional[str] = None,
+                 data_prefix: dict = dict(img=''),
+                 filter_cfg: Optional[dict] = None,
+                 indices: Optional[Union[int, Sequence[int]]] = None,
+                 serialize_data: bool = True,
+                 pipeline: List[Union[dict, Callable]] = [],
+                 test_mode: bool = False,
+                 lazy_init: bool = False,
+                 max_refetch: int = 1000,
+                 used_data_keys: Optional[Sequence[str]] = None):
+
+        # select keypoints to be used in training
+        self.used_data_keys = used_data_keys
+        metainfo = self._check_metainfo(used_data_keys)
+
+        super().__init__(
+            ann_file=ann_file,
+            bbox_file = bbox_file,
+            data_mode = data_mode,
+            metainfo=metainfo,
+            data_root=data_root,
+            data_prefix=data_prefix,
+            filter_cfg=filter_cfg,
+            indices=indices,
+            serialize_data=serialize_data,
+            pipeline=pipeline,
+            test_mode=test_mode,
+            lazy_init=lazy_init,
+            max_refetch=max_refetch)
+
+    @classmethod
+    def _check_metainfo(cls, used_data_keys: Optional[Sequence[str]] = None):
+        if used_data_keys is None:
+            return None
+
+        cfg_file = cls.METAINFO['from_file']
+        metainfo = Config.fromfile(cfg_file).dataset_info
+        keypoint_info = {}
+        index = 0
+        for _, keypoint in metainfo['keypoint_info'].items():
+            name = keypoint['name']
+            if name in used_data_keys:
+                keypoint['id'] = index
+                keypoint_info[index] = keypoint
+                index += 1
+        metainfo['keypoint_info'] = keypoint_info
+
+        return metainfo
 
     def _load_annotations(self) -> Tuple[List[dict], List[dict]]:
         """Load data from annotations in COCO format."""
@@ -98,11 +152,12 @@ class InfinityDataset(BaseCocoStyleDataset):
         # keypoints in shape [1, K, 2] and keypoints_visible in [1, K]
         keypoints_list = deepcopy(ann["coco_keypoints"])
         for ipt, name in enumerate(self.infinity_keypoints_name):
-            keypoints_list += [
-                ann["keypoints"][name]["x"],
-                ann["keypoints"][name]["y"],
-                ann["keypoints"][name]["v"],
-            ]
+            if name in self.used_data_keys:
+                keypoints_list += [
+                    ann["keypoints"][name]["x"],
+                    ann["keypoints"][name]["y"],
+                    ann["keypoints"][name]["v"],
+                ]
 
         _keypoints = np.array(keypoints_list, dtype=np.float32).reshape(1, -1, 3)
         keypoints = _keypoints[..., :2]

@@ -97,6 +97,7 @@ class InfinityMetric(CocoMetric):
         outfile_prefix: Optional[str] = None,
         collect_device: str = "cpu",
         prefix: Optional[str] = None,
+        used_data_keys: Optional[Sequence[str]] = None,
     ) -> None:
         super().__init__(
             ann_file=ann_file,
@@ -111,8 +112,60 @@ class InfinityMetric(CocoMetric):
             collect_device=collect_device,
             prefix=prefix,
         )
+        self.used_data_keys = used_data_keys
         self.infinity_keypoints_name = self.coco.loadCats(0)[0]["augmented_keypoints"]
         self.coco = None
+
+    def _do_python_keypoint_eval(self, outfile_prefix: str) -> list:
+        """Do keypoint evaluation using COCOAPI.
+
+        Args:
+            outfile_prefix (str): The filename prefix of the json files. If the
+                prefix is "somepath/xxx", the json files will be named
+                "somepath/xxx.keypoints.json",
+
+        Returns:
+            list: a list of tuples. Each tuple contains the evaluation stats
+            name and corresponding stats value.
+        """
+        res_file = f"{outfile_prefix}.keypoints.json"
+        coco_det = self.coco.loadRes(res_file)
+        sigmas = self.dataset_meta["sigmas"][:len(self.used_data_keys)]
+        coco_eval = COCOeval(self.coco, coco_det, self.iou_type, sigmas, self.use_area)
+        coco_eval.params.useSegm = None
+        coco_eval.evaluate()
+        coco_eval.accumulate()
+        coco_eval.summarize()
+
+        if self.iou_type == "keypoints_crowd":
+            stats_names = [
+                "AP",
+                "AP .5",
+                "AP .75",
+                "AR",
+                "AR .5",
+                "AR .75",
+                "AP(E)",
+                "AP(M)",
+                "AP(H)",
+            ]
+        else:
+            stats_names = [
+                "AP",
+                "AP .5",
+                "AP .75",
+                "AP (M)",
+                "AP (L)",
+                "AR",
+                "AR .5",
+                "AR .75",
+                "AR (M)",
+                "AR (L)",
+            ]
+
+        info_str = list(zip(stats_names, coco_eval.stats))
+
+        return info_str
 
     def process(self, data_batch: Sequence[dict], data_samples: Sequence[dict]) -> None:
         """Process one batch of data samples and predictions. The processed
@@ -194,11 +247,12 @@ class InfinityMetric(CocoMetric):
                 )
                 keypoints_list = deepcopy(data_sample["raw_ann_info"]["coco_keypoints"])
                 for ipt, name in enumerate(self.infinity_keypoints_name):
-                    keypoints_list += [
-                        data_sample["raw_ann_info"]["keypoints"][name]["x"],
-                        data_sample["raw_ann_info"]["keypoints"][name]["y"],
-                        data_sample["raw_ann_info"]["keypoints"][name]["v"],
-                    ]
+                    if name in self.used_data_keys:
+                        keypoints_list += [
+                            data_sample["raw_ann_info"]["keypoints"][name]["x"],
+                            data_sample["raw_ann_info"]["keypoints"][name]["y"],
+                            data_sample["raw_ann_info"]["keypoints"][name]["v"],
+                        ]
 
                 anns = deepcopy(data_sample["raw_ann_info"])
                 anns["keypoints"] = keypoints_list
@@ -225,6 +279,7 @@ class InfinityCocoMetric(CocoMetric):
         outfile_prefix: Optional[str] = None,
         collect_device: str = "cpu",
         prefix: Optional[str] = None,
+        used_data_keys: Optional[Sequence[str]] = None,
     ) -> None:
         super().__init__(
             ann_file=ann_file,
@@ -239,6 +294,7 @@ class InfinityCocoMetric(CocoMetric):
             collect_device=collect_device,
             prefix=prefix,
         )
+        self.used_data_keys = used_data_keys
         self.infinity_keypoints_name = self.coco.loadCats(0)[0]["augmented_keypoints"]
         self.coco = None
 
@@ -401,6 +457,7 @@ class InfinityAnatomicalMetric(CocoMetric):
         outfile_prefix: Optional[str] = None,
         collect_device: str = "cpu",
         prefix: Optional[str] = None,
+        used_data_keys: Optional[Sequence[str]] = None,
     ) -> None:
         super().__init__(
             ann_file=ann_file,
@@ -415,6 +472,7 @@ class InfinityAnatomicalMetric(CocoMetric):
             collect_device=collect_device,
             prefix=prefix,
         )
+        self.used_data_keys = used_data_keys
         self.infinity_keypoints_name = self.coco.loadCats(0)[0]["augmented_keypoints"]
         self.coco = None
 
@@ -432,7 +490,7 @@ class InfinityAnatomicalMetric(CocoMetric):
         """
         res_file = f"{outfile_prefix}.keypoints.json"
         coco_det = self.coco.loadRes(res_file)
-        sigmas = self.dataset_meta["sigmas"][17:]
+        sigmas = self.dataset_meta["sigmas"][17:len(self.used_data_keys)]
         coco_eval = COCOeval(self.coco, coco_det, self.iou_type, sigmas, self.use_area)
         coco_eval.params.useSegm = None
         coco_eval.evaluate()
@@ -485,7 +543,7 @@ class InfinityAnatomicalMetric(CocoMetric):
                 - 'pred_instances': The prediction results of instance(s)
         """
         self.dataset_meta = deepcopy(self.dataset_meta)
-        self.dataset_meta["num_keypoints"] = 51
+        self.dataset_meta["num_keypoints"] = len(self.used_data_keys) - 17
         for data_sample in data_samples:
             if "pred_instances" not in data_sample:
                 raise ValueError(
@@ -554,11 +612,12 @@ class InfinityAnatomicalMetric(CocoMetric):
 
                 keypoints_list = []
                 for ipt, name in enumerate(self.infinity_keypoints_name):
-                    keypoints_list += [
-                        data_sample["raw_ann_info"]["keypoints"][name]["x"],
-                        data_sample["raw_ann_info"]["keypoints"][name]["y"],
-                        data_sample["raw_ann_info"]["keypoints"][name]["v"],
-                    ]
+                    if name in self.used_data_keys:
+                        keypoints_list += [
+                            data_sample["raw_ann_info"]["keypoints"][name]["x"],
+                            data_sample["raw_ann_info"]["keypoints"][name]["y"],
+                            data_sample["raw_ann_info"]["keypoints"][name]["v"],
+                        ]
                 anns = deepcopy(data_sample["raw_ann_info"])
                 anns["keypoints"] = keypoints_list
                 gt["raw_ann_info"] = anns if isinstance(anns, list) else [anns]

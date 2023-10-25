@@ -1,5 +1,49 @@
 _base_ = ["../../../_base_/default_runtime.py"]
 
+used_data_keys=[
+        "nose",
+        "left_eye",
+        "right_eye",
+        "left_ear",
+        "right_ear",
+        "left_shoulder",
+        "right_shoulder",
+        "left_elbow",
+        "right_elbow",
+        "left_wrist",
+        "right_wrist",
+        "left_hip",
+        "right_hip",
+        "left_knee",
+        "right_knee",
+        "left_ankle",
+        "right_ankle",
+        "sternum",
+        "rshoulder",
+        "lshoulder",
+        "r_lwrist",
+        "l_lwrist",
+        "r_mwrist",
+        "l_mwrist",
+        "r_ASIS",
+        "l_ASIS",
+        "r_PSIS",
+        "l_PSIS",
+        "r_ankle",
+        "l_ankle",
+        "r_mankle",
+        "l_mankle",
+        "r_5meta",
+        "l_5meta",
+        "r_big_toe",
+        "l_big_toe",
+        "l_calc",
+        "r_calc",
+        "C7",
+        "L2",
+        "T11",
+        "T6",
+    ]
 # runtime
 train_cfg = dict(max_epochs=210, val_interval=1)
 
@@ -95,7 +139,7 @@ model = dict(
     head=dict(
         type="HeatmapHead",
         in_channels=32,
-        out_channels=68,
+        out_channels=len(used_data_keys),
         deconv_out_channels=None,
         loss=dict(type="KeypointMSELoss", use_target_weight=True),
         decoder=codec,
@@ -140,9 +184,10 @@ train_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file="combined_dataset/train/annotations.json",
+        ann_file="combined_dataset_15fps/train/annotations.json",
         data_prefix=dict(img=""),
         pipeline=train_pipeline,
+        used_data_keys=used_data_keys,
     ),
 )
 
@@ -160,10 +205,11 @@ val_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file="20221018_1_250_batch01hand_zoom_suburb_b_6fps/annotations.json",
+        ann_file="combined_dataset_15fps/test/annotations.json",
         data_prefix=dict(img=""),
         test_mode=True,
         pipeline=val_pipeline,
+        used_data_keys=used_data_keys,
     ),
 )
 test_dataloader = val_dataloader
@@ -173,20 +219,23 @@ val_evaluator = [
     dict(
         type="InfinityMetric",
         ann_file=data_root
-        + "20221018_1_250_batch01hand_zoom_suburb_b_6fps/annotations.json",
+        + "combined_dataset_15fps/test/annotations.json",
         use_area=False,
+        used_data_keys=used_data_keys,
     ),
     dict(
         type="InfinityCocoMetric",
         ann_file=data_root
-        + "20221018_1_250_batch01hand_zoom_suburb_b_6fps/annotations.json",
+        + "combined_dataset_15fps/test/annotations.json",
         use_area=False,
+        used_data_keys=used_data_keys,
     ),
     dict(
         type="InfinityAnatomicalMetric",
         ann_file=data_root
-        + "20221018_1_250_batch01hand_zoom_suburb_b_6fps/annotations.json",
+        + "combined_dataset_15fps/test/annotations.json",
         use_area=False,
+        used_data_keys=used_data_keys,
     ),
 ]
 

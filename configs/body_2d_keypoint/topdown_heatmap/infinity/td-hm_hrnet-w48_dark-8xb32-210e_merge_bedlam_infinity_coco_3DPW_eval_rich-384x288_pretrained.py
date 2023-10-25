@@ -309,19 +309,16 @@ val_evaluator = [
         type="InfinityMetric",
         ann_file=data_root + "val_annotations.json",
         use_area=False,
-        used_data_keys=used_data_keys,
     ),
     dict(
         type="InfinityCocoMetric",
         ann_file=data_root + "val_annotations.json",
         use_area=False,
-        used_data_keys=used_data_keys,
     ),
     dict(
         type="InfinityAnatomicalMetric",
         ann_file=data_root + "val_annotations.json",
         use_area=False,
-        used_data_keys=used_data_keys,
     ),
 ]
 
