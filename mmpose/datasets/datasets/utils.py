@@ -6,7 +6,7 @@ import numpy as np
 from mmengine import Config
 
 
-def parse_pose_metainfo(metainfo: dict):
+def parse_pose_metainfo(metainfo: dict, used_data_keys = None):
     """Load meta information of pose dataset and check its integrity.
 
     Args:
@@ -111,6 +111,17 @@ def parse_pose_metainfo(metainfo: dict):
         # TODO: remove the nested structure of dataset_info
         # metainfo = Config.fromfile(metainfo['from_file'])
         metainfo = Config.fromfile(cfg_file).dataset_info
+
+    if used_data_keys is not None:
+        keypoint_info = sorted([(key, value) for key, value in metainfo["keypoint_info"].items()], key = lambda x: x[0])
+        keypoint_info_filtered = [element[1] for element in keypoint_info if element[1]["name"] in used_data_keys]
+        keypoint_info_filtered_dict = {i: element for i, element in enumerate(keypoint_info_filtered)}
+        for i, element in keypoint_info_filtered_dict.items():
+            element["id"] = i
+
+        metainfo["keypoint_info"] = keypoint_info_filtered_dict
+        metainfo["joint_weights"] = metainfo["joint_weights"][:len(used_data_keys)]
+        metainfo["sigmas"] = metainfo["sigmas"][:len(used_data_keys)]
 
     # check data integrity
     assert 'dataset_name' in metainfo

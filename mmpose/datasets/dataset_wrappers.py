@@ -26,6 +26,7 @@ class CombinedDataset(BaseDataset):
         metainfo: dict,
         datasets: list,
         pipeline: List[Union[dict, Callable]] = [],
+        used_data_keys = None,
         **kwargs,
     ):
         self.datasets = []
@@ -38,7 +39,7 @@ class CombinedDataset(BaseDataset):
         self._len = sum(self._lens)
 
         super(CombinedDataset, self).__init__(pipeline=pipeline, **kwargs)
-        self._metainfo = parse_pose_metainfo(metainfo)
+        self._metainfo = parse_pose_metainfo(metainfo, used_data_keys = used_data_keys)
 
     @property
     def metainfo(self):
@@ -106,11 +107,11 @@ class CombinedDataset(BaseDataset):
 
         # Add metainfo items that are required in the pipeline and the model
         metainfo_keys = [
-            # "upper_body_ids",
-            # "lower_body_ids",
-            # "flip_pairs",
-            # "dataset_keypoint_weights",
-            # "flip_indices",
+            "upper_body_ids",
+            "lower_body_ids",
+            "flip_pairs",
+            "dataset_keypoint_weights",
+            "flip_indices",
         ]
 
         for key in metainfo_keys:

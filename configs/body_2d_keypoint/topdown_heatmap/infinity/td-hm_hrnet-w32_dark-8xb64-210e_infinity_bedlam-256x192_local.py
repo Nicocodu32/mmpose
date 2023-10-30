@@ -188,25 +188,56 @@ dataset_infinity = dict(
     used_data_keys=used_data_keys,
 )
 
-dataset_type = "InfinityDataset"
-data_mode = "topdown"
-data_root = "../"
-
-dataset_infinity2 = dict(
-    type=dataset_type,
-    data_root=data_root,
+dataset_coco = dict(
+    type="CocoDataset",
+    data_root="../deep-high-resolution-net.pytorch/data/coco",
     data_mode=data_mode,
-    ann_file="combined_dataset_15fps/test/annotations.json",
-    data_prefix=dict(img=""),
-    pipeline=[],
-    used_data_keys=used_data_keys,
+    ann_file="annotations/person_keypoints_val2017.json",
+    data_prefix=dict(img="images/val2017/"),
+    pipeline=[
+        dict(
+            type="KeypointConverter",
+            num_keypoints=len(used_data_keys),
+            mapping=[
+                (0, 0),
+                (1, 1),
+                (2, 2),
+                (3, 3),
+                (4, 4),
+                (5, 5),
+                (6, 6),
+                (7, 7),
+                (8, 8),
+                (9, 9),
+                (10, 10),
+                (11, 11),
+                (12, 12),
+                (13, 13),
+                (14, 14),
+                (15, 15),
+                (16, 16),
+            ],
+        )
+    ],
 )
+# metainfo = dict(from_file="configs/_base_/datasets/infinity.py")
+# print(metainfo)
+# keypoint_info = sorted([(key, value) for key, value in metainfo["keypoint_info"].items()], key = lambda x: x[0])
+# keypoint_info_filtered = [element[1] for element in element if element[1]["name"] in used_data_keys]
+# keypoint_info_filtered_dict = {i: element for i, element in enumerate(keypoint_info_filtered)}
+# for i, element in keypoint_info_filtered_dict.items():
+#     element["id"] = i
+
+# metainfo["keypoint_info"] = keypoint_info_filtered_dict
+# metainfo["joint_weights"] = metainfo["joint_weights"][:len(used_data_keys)]
+# metainfo["sigmas"] = metainfo["sigmas"][:len(used_data_keys)]
 
 combined_dataset = dict(
     type="CombinedDataset",
     metainfo=dict(from_file="configs/_base_/datasets/infinity.py"),
-    datasets=[dataset_infinity, dataset_infinity2],
+    datasets=[dataset_infinity, dataset_coco],
     pipeline=train_pipeline,
+    used_data_keys = used_data_keys,
     test_mode=False,
 )
 
