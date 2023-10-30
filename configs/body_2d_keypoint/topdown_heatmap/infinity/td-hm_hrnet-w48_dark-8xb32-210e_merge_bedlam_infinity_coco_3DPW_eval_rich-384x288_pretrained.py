@@ -259,6 +259,7 @@ combined_dataset = dict(
     metainfo=dict(from_file="configs/_base_/datasets/infinity.py"),
     datasets=[dataset_infinity, dataset_bedlam, dataset_3DPW, dataset_coco],
     pipeline=train_pipeline,
+    used_data_keys=used_data_keys,
     test_mode=False,
 )
 
