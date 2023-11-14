@@ -22,6 +22,10 @@ used_data_keys=[
         "sternum",
         "rshoulder",
         "lshoulder",
+        "r_lelbow",
+        "l_lelbow",
+        "r_melbow",
+        "l_melbow",
         "r_lwrist",
         "l_lwrist",
         "r_mwrist",
@@ -30,12 +34,18 @@ used_data_keys=[
         "l_ASIS",
         "r_PSIS",
         "l_PSIS",
+        "r_knee",
+        "l_knee",
+        "r_mknee",
+        "l_mknee",
         "r_ankle",
         "l_ankle",
         "r_mankle",
         "l_mankle",
         "r_5meta",
         "l_5meta",
+        "r_toe",
+        "l_toe",
         "r_big_toe",
         "l_big_toe",
         "l_calc",
@@ -353,4 +363,4 @@ default_hooks = dict(
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=20),
 )
 
-work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_bedlam_infinity_coco_3DPW_eval_bedlam/HRNet/w48_dark_pretrained"
+work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_bedlam_infinity_coco_3DPW_eval_bedlam_final/HRNet/w48_dark_pretrained"
