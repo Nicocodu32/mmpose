@@ -141,9 +141,6 @@ model = dict(
                 num_channels=(48, 96, 192, 384),
             ),
         ),
-        init_cfg=dict(
-            type="Pretrained",
-        ),
     ),
     head=dict(
         type="HeatmapHead",
