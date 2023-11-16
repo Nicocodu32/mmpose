@@ -1,4 +1,3 @@
-
 #!/usr/bin/bash
 #SBATCH --job-name=vit_huge_final
 #SBATCH --output=vit_huge_final.out

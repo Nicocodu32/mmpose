@@ -1,4 +1,3 @@
-
 #!/usr/bin/bash
 #SBATCH --job-name=vit_base_no_bedlam
 #SBATCH --output=vit_base_no_bedlam.out

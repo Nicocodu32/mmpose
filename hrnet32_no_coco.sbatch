@@ -1,4 +1,3 @@
-
 #!/usr/bin/bash
 #SBATCH --job-name=hrnet32_no_coco
 #SBATCH --output=hrnet32_no_coco.out

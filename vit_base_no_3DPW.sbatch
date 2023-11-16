@@ -1,4 +1,3 @@
-
 #!/usr/bin/bash
 #SBATCH --job-name=vit_base_no_3DPW
 #SBATCH --output=vit_base_no_3DPW.out

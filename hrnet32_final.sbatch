@@ -1,4 +1,3 @@
-
 #!/usr/bin/bash
 #SBATCH --job-name=hrnet32_final
 #SBATCH --output=hrnet32_final.out

@@ -1,4 +1,3 @@
-
 #!/usr/bin/bash
 #SBATCH --job-name=hrnet32_no_3DPW
 #SBATCH --output=hrnet32_no_3DPW.out

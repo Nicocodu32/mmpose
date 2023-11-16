@@ -1,4 +1,3 @@
-
 #!/usr/bin/bash
 #SBATCH --job-name=vit_base_no_coco
 #SBATCH --output=vit_base_no_coco.out
