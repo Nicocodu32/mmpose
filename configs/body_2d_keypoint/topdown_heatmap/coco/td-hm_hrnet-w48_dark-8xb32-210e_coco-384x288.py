@@ -76,7 +76,9 @@ model = dict(
         init_cfg=dict(
             type='Pretrained',
             checkpoint='https://download.openmmlab.com/mmpose/'
-            'pretrain_models/hrnet_w48-8ef0771d.pth'),
+            'pretrain_models/hrnet_w48-8ef0771d.pth',
+            prefix='backbone',
+        )
     ),
     head=dict(
         type='HeatmapHead',
