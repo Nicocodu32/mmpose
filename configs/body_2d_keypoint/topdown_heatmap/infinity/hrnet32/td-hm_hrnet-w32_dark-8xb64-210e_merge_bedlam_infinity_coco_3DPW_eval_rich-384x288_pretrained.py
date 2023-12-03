@@ -1,7 +1,63 @@
 _base_ = ["../../../_base_/default_runtime.py"]
 
+
+used_data_keys=[
+        "nose",
+        "left_eye",
+        "right_eye",
+        "left_ear",
+        "right_ear",
+        "left_shoulder",
+        "right_shoulder",
+        "left_elbow",
+        "right_elbow",
+        "left_wrist",
+        "right_wrist",
+        "left_hip",
+        "right_hip",
+        "left_knee",
+        "right_knee",
+        "left_ankle",
+        "right_ankle",
+        "sternum",
+        "rshoulder",
+        "lshoulder",
+        "r_lelbow",
+        "l_lelbow",
+        "r_melbow",
+        "l_melbow",
+        "r_lwrist",
+        "l_lwrist",
+        "r_mwrist",
+        "l_mwrist",
+        "r_ASIS",
+        "l_ASIS",
+        "r_PSIS",
+        "l_PSIS",
+        "r_knee",
+        "l_knee",
+        "r_mknee",
+        "l_mknee",
+        "r_ankle",
+        "l_ankle",
+        "r_mankle",
+        "l_mankle",
+        "r_5meta",
+        "l_5meta",
+        "r_toe",
+        "l_toe",
+        "r_big_toe",
+        "l_big_toe",
+        "l_calc",
+        "r_calc",
+        "C7",
+        "L2",
+        "T11",
+        "T6",
+    ]
+
 # runtime
-train_cfg = dict(max_epochs=210, val_interval=1)
+train_cfg = dict(max_epochs=30, val_interval=3)
 
 # optimizer
 optim_wrapper = dict(
@@ -19,8 +75,8 @@ param_scheduler = [
     dict(
         type="MultiStepLR",
         begin=0,
-        end=210,
-        milestones=[170, 200],
+        end=30,
+        milestones=[14, 20],
         gamma=0.1,
         by_epoch=True,
     ),
@@ -87,14 +143,16 @@ model = dict(
         ),
         init_cfg=dict(
             type="Pretrained",
-            checkpoint="https://download.openmmlab.com/mmpose/"
-            "pretrain_models/hrnet_w32-36af842e.pth",
+            # checkpoint="/scratch/users/yonigoz/mmpose_data/ckpts/hrnet/"
+            # "td-hm_hrnet-w32_dark-8xb64-210e_coco-256x192-0e00bf12_20220914.pth",
+            checkpoint="/scratch/users/yonigoz/mmpose_data/work_dirs/merge_bedlam_infinity_coco_3DPW_eval_bedlam_final/HRNet/w32_dark_bedlam/best_infinity_AP_epoch_21.pth",
+            prefix="backbone",
         ),
     ),
     head=dict(
         type="HeatmapHead",
         in_channels=32,
-        out_channels=68,
+        out_channels=len(used_data_keys),
         deconv_out_channels=None,
         loss=dict(type="KeypointMSELoss", use_target_weight=True),
         decoder=codec,
@@ -106,29 +164,65 @@ model = dict(
     ),
 )
 
+
 # base dataset settings
 dataset_type = "InfinityDataset"
 data_mode = "topdown"
-data_root = "../combined_dataset"
+data_root = "/scratch/users/yonigoz/infinity_datasets/"
 
 dataset_infinity = dict(
     type=dataset_type,
     data_root=data_root,
     data_mode=data_mode,
-    ann_file="train/annotations.json",
-    data_prefix=dict(img="train/images/"),
+    ann_file="combined_dataset_15fps/train/annotations.json",
+    data_prefix=dict(img=""),
     pipeline=[],
+    used_data_keys=used_data_keys,
 )
-dataset_coco = dict(
-    type="CocoDataset",
-    data_root="../deep-high-resolution-net.pytorch/data/coco",
+
+dataset_type = "InfinityDataset"
+data_mode = "topdown"
+data_root = "/scratch/users/yonigoz/BEDLAM/data/"
+
+dataset_bedlam = dict(
+    type=dataset_type,
+    data_root=data_root,
     data_mode=data_mode,
-    ann_file="annotations/person_keypoints_val2017.json",
-    data_prefix=dict(img="images/val2017/"),
+    ann_file="train_annotations.json",
+    data_prefix=dict(img="training_images/"),
+    pipeline=[],
+    used_data_keys=used_data_keys,
+)
+
+dataset_type = "InfinityDataset"
+data_mode = "topdown"
+data_root = "/scratch/users/yonigoz/"
+
+dataset_3DPW = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file="3DPW/train_annotations.json",
+    data_prefix=dict(img=""),
+    pipeline=[],
+    used_data_keys=used_data_keys,
+)
+
+dataset_type = "CocoDataset"
+data_mode = "topdown"
+data_root = "/scratch/users/yonigoz/coco_dataset"
+
+
+dataset_coco = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file="annotations/person_keypoints_train2017.json",
+    data_prefix=dict(img="images/train2017/"),
     pipeline=[
         dict(
             type="KeypointConverter",
-            num_keypoints=53,
+            num_keypoints=len(used_data_keys),
             mapping=[
                 (0, 0),
                 (1, 1),
@@ -152,7 +246,6 @@ dataset_coco = dict(
     ],
 )
 
-
 # pipelines
 train_pipeline = [
     dict(type="LoadImage"),
@@ -170,34 +263,42 @@ val_pipeline = [
     dict(type="TopdownAffine", input_size=codec["input_size"]),
     dict(type="PackPoseInputs"),
 ]
+test_pipeline = val_pipeline
 
 combined_dataset = dict(
     type="CombinedDataset",
     metainfo=dict(from_file="configs/_base_/datasets/infinity.py"),
-    datasets=[dataset_infinity, dataset_coco],
+    datasets=[dataset_infinity, dataset_bedlam, dataset_3DPW, dataset_coco],
     pipeline=train_pipeline,
+    used_data_keys=used_data_keys,
     test_mode=False,
 )
 
 train_sampler = dict(
     type="MultiSourceSampler",
-    batch_size=12,
-    source_ratio=[1, 3],
+    batch_size=64,
+    source_ratio=[1, 1, 1, 1],
     shuffle=True,
 )
 
 # data loaders
 train_dataloader = dict(
-    batch_size=12,
-    num_workers=2,
+    batch_size=64,
+    num_workers=4,
     persistent_workers=True,
-    # sampler=dict(type="DefaultSampler", shuffle=True),
     sampler=train_sampler,
     dataset=combined_dataset,
 )
+
+
+dataset_type = "InfinityDataset"
+data_mode = "topdown"
+data_root = ""
+# data_root = "/scratch/users/yonigoz/BEDLAM/data/"
+
 val_dataloader = dict(
-    batch_size=6,
-    num_workers=2,
+    batch_size=64,
+    num_workers=4,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
@@ -205,18 +306,38 @@ val_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file="test/annotations.json",
-        data_prefix=dict(img="test/images/"),
+        ann_file="/scratch/users/yonigoz/RICH/full_test/downsampled/val_annotations.json",
+        # data_prefix=dict(img="eval_images/"),
+        data_prefix=dict(img=""),
         test_mode=True,
         pipeline=val_pipeline,
+        used_data_keys=used_data_keys,
     ),
 )
 test_dataloader = val_dataloader
 
 # evaluators
-val_evaluator = dict(
-    type="InfinityMetric", ann_file=data_root + "/test/annotations.json", use_area=False
-)
+val_evaluator = [
+    dict(
+        type="InfinityMetric",
+        ann_file=data_root + "/scratch/users/yonigoz/RICH/full_test/downsampled/val_annotations.json",
+        use_area=False,
+        used_data_keys=used_data_keys,
+    ),
+    dict(
+        type="InfinityCocoMetric",
+        ann_file=data_root + "/scratch/users/yonigoz/RICH/full_test/downsampled/val_annotations.json",
+        use_area=False,
+        used_data_keys=used_data_keys,
+    ),
+    dict(
+        type="InfinityAnatomicalMetric",
+        ann_file=data_root + "/scratch/users/yonigoz/RICH/full_test/downsampled/val_annotations.json",
+        use_area=False,
+        used_data_keys=used_data_keys,
+    ),
+]
+
 test_evaluator = val_evaluator
 
 # visualizer
@@ -228,7 +349,7 @@ vis_backends = [
         init_kwargs=dict(
             project="synthetic_finetuning",
             entity="yonigoz",
-            name="merge_infinity_coco/HRNet/w32_dark",
+            name="merge_bedlam_infinity_coco_3DPW_eval_bedlam_final/HRNet/w32_dark_pretrained",
         ),
     ),
 ]
@@ -238,9 +359,11 @@ visualizer = dict(
 
 default_hooks = dict(
     timer=dict(type="IterTimerHook"),
-    logger=dict(type="LoggerHook", interval=10),
+    logger=dict(type="LoggerHook", interval=1000),
     param_scheduler=dict(type="ParamSchedulerHook"),
-    checkpoint=dict(type="CheckpointHook", interval=10),
+    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2),
     sampler_seed=dict(type="DistSamplerSeedHook"),
-    visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
+    visualization=dict(type="PoseVisualizationHook", enable=True, interval=20),
 )
+
+work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_bedlam_infinity_coco_3DPW_eval_bedlam_final/HRNet/w32_dark_bedlam"

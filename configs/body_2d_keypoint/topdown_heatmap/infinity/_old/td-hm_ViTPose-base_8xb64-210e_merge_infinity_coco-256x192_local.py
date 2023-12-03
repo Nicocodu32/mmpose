@@ -1,8 +1,7 @@
 _base_ = ["../../../_base_/default_runtime.py"]
 
-resume = False
 # runtime
-train_cfg = dict(max_epochs=210, val_interval=1)
+train_cfg = dict(max_epochs=210, val_interval=5)
 
 # optimizer
 custom_imports = dict(
@@ -46,7 +45,7 @@ auto_scale_lr = dict(base_batch_size=512)
 
 # hooks
 default_hooks = dict(
-    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=1)
+    checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2)
 )
 
 # codec settings
@@ -93,10 +92,52 @@ model = dict(
     ),
 )
 
+
 # base dataset settings
-data_root = "../combined_dataset"
 dataset_type = "InfinityDataset"
 data_mode = "topdown"
+data_root = "../combined_dataset_source/dataset_large_500"
+
+dataset_infinity = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file="train/annotations.json",
+    data_prefix=dict(img="train/images/"),
+    pipeline=[],
+)
+dataset_coco = dict(
+    type="CocoDataset",
+    data_root="../deep-high-resolution-net.pytorch/data/coco",
+    data_mode=data_mode,
+    ann_file="annotations/person_keypoints_val2017.json",
+    data_prefix=dict(img="images/val2017/"),
+    pipeline=[
+        dict(
+            type="KeypointConverter",
+            num_keypoints=53,
+            mapping=[
+                (0, 0),
+                (1, 1),
+                (2, 2),
+                (3, 3),
+                (4, 4),
+                (5, 5),
+                (6, 6),
+                (7, 7),
+                (8, 8),
+                (9, 9),
+                (10, 10),
+                (11, 11),
+                (12, 12),
+                (13, 13),
+                (14, 14),
+                (15, 15),
+                (16, 16),
+            ],
+        )
+    ],
+)
 
 # pipelines
 train_pipeline = [
@@ -116,24 +157,34 @@ val_pipeline = [
     dict(type="PackPoseInputs"),
 ]
 
+combined_dataset = dict(
+    type="CombinedDataset",
+    metainfo=dict(from_file="configs/_base_/datasets/infinity.py"),
+    datasets=[dataset_infinity],
+    pipeline=train_pipeline,
+    test_mode=False,
+)
+
+train_sampler = dict(
+    type="MultiSourceSampler",
+    batch_size=32,
+    source_ratio=[1],
+    shuffle=True,
+)
+
 # data loaders
 train_dataloader = dict(
-    batch_size=4,
-    num_workers=2,
+    batch_size=32,
+    num_workers=8,
     persistent_workers=True,
-    sampler=dict(type="DefaultSampler", shuffle=True),
-    dataset=dict(
-        type=dataset_type,
-        data_root=data_root,
-        data_mode=data_mode,
-        ann_file="train/annotations.json",
-        data_prefix=dict(img="train/images/"),
-        pipeline=train_pipeline,
-    ),
+    # sampler=dict(type="DefaultSampler", shuffle=True),
+    sampler=train_sampler,
+    dataset=combined_dataset,
 )
+
 val_dataloader = dict(
-    batch_size=2,
-    num_workers=2,
+    batch_size=16,
+    num_workers=8,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False, round_up=False),
@@ -161,20 +212,27 @@ val_evaluator = [
         ann_file=data_root + "/test/annotations.json",
         use_area=False,
     ),
+    dict(
+        type="InfinityAnatomicalMetric",
+        ann_file=data_root + "/test/annotations.json",
+        use_area=False,
+    ),
 ]
-test_evaluator = val_evaluator
 
+test_evaluator = val_evaluator
 
 # visualizer
 vis_backends = [
     dict(type="LocalVisBackend"),
     # dict(type='TensorboardVisBackend'),
-    dict(
-        type="WandbVisBackend",
-        init_kwargs=dict(
-            project="synthetic_finetuning", entity="yonigoz", name="infinity/ViT/base"
-        ),
-    ),
+    # dict(
+    #     type="WandbVisBackend",
+    #     init_kwargs=dict(
+    #         project="synthetic_finetuning",
+    #         entity="yonigoz",
+    #         name="merge_infinity_coco/ViT/base",
+    #     ),
+    # ),
 ]
 visualizer = dict(
     type="PoseLocalVisualizer", vis_backends=vis_backends, name="visualizer"
@@ -189,4 +247,4 @@ default_hooks = dict(
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=5),
 )
 
-work_dir = "./mmpose_data/work_dirs/infinity/ViT/base"
+# work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_infinity_coco/ViT/base"

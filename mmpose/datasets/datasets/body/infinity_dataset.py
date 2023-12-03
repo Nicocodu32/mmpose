@@ -60,16 +60,13 @@ class InfinityDataset(BaseCocoStyleDataset):
 
     @classmethod
     def _check_metainfo(cls, used_data_keys: Optional[Sequence[str]] = None):
-        if used_data_keys is None:
-            return None
-
         cfg_file = cls.METAINFO['from_file']
         metainfo = Config.fromfile(cfg_file).dataset_info
         keypoint_info = {}
         index = 0
         for _, keypoint in metainfo['keypoint_info'].items():
             name = keypoint['name']
-            if name in used_data_keys:
+            if used_data_keys is None or name in used_data_keys:
                 keypoint['id'] = index
                 keypoint_info[index] = keypoint
                 index += 1
@@ -152,7 +149,7 @@ class InfinityDataset(BaseCocoStyleDataset):
         # keypoints in shape [1, K, 2] and keypoints_visible in [1, K]
         keypoints_list = deepcopy(ann["coco_keypoints"])
         for ipt, name in enumerate(self.infinity_keypoints_name):
-            if name in self.used_data_keys:
+            if self.used_data_keys is None or name in self.used_data_keys:
                 keypoints_list += [
                     ann["keypoints"][name]["x"],
                     ann["keypoints"][name]["y"],

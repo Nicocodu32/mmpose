@@ -20,8 +20,111 @@ from mmpose.registry import VISUALIZERS
 from mmpose.structures import merge_data_samples, split_instances
 from mmpose.utils import adapt_mmdet_pipeline
 
-# DET_CONFIG = "demo/mmdetection_cfg/configs/convnext/cascade-mask-rcnn_convnext-t-p4-w7_fpn_4conv1fc-giou_amp-ms-crop-3x_coco.py"
-# DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/convnext/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco_20220509_204200-8f07c40b.pth"
+markerNames = [
+        "sternum",
+        "rshoulder",
+        "lshoulder",
+        "r_lelbow",
+        "l_lelbow",
+        "r_melbow",
+        "l_melbow",
+        "r_lwrist",
+        "l_lwrist",
+        "r_mwrist",
+        "l_mwrist",
+        "r_ASIS",
+        "l_ASIS",
+        "r_PSIS",
+        "l_PSIS",
+        "r_knee",
+        "l_knee",
+        "r_mknee",
+        "l_mknee",
+        "r_ankle",
+        "l_ankle",
+        "r_mankle",
+        "l_mankle",
+        "r_5meta",
+        "l_5meta",
+        "r_toe",
+        "l_toe",
+        "r_big_toe",
+        "l_big_toe",
+        "l_calc",
+        "r_calc",
+        "r_bpinky",
+        "l_bpinky",
+        "r_tpinky",
+        "l_tpinky",
+        "r_bindex",
+        "l_bindex",
+        "r_tindex",
+        "l_tindex",
+        "r_tmiddle",
+        "l_tmiddle",
+        "r_tring",
+        "l_tring",
+        "r_bthumb",
+        "l_bthumb",
+        "r_tthumb",
+        "l_tthumb",
+        "C7",
+        "L2",
+        "T11",
+        "T6",
+    ]
+
+markerPairs = {
+        "rshoulder":"lshoulder",
+        "lshoulder":"rshoulder",
+        "r_lelbow":"l_lelbow",
+        "l_lelbow":"r_lelbow",
+        "r_melbow":"l_melbow",
+        "l_melbow":"r_melbow",
+        "r_lwrist":"l_lwrist",
+        "l_lwrist":"r_lwrist",
+        "r_mwrist":"l_mwrist",
+        "l_mwrist":"r_mwrist",
+        "r_ASIS":"l_ASIS",
+        "l_ASIS":"r_ASIS",
+        "r_PSIS":"l_PSIS",
+        "l_PSIS":"r_PSIS",
+        "r_knee":"l_knee",
+        "l_knee":"r_knee",
+        "r_mknee":"l_mknee",
+        "l_mknee":"r_mknee",
+        "r_ankle":"l_ankle",
+        "l_ankle":"r_ankle",
+        "r_mankle":"l_mankle",
+        "l_mankle":"r_mankle",
+        "r_5meta":"l_5meta",
+        "l_5meta":"r_5meta",
+        "r_toe":"l_toe",
+        "l_toe":"r_toe",
+        "r_big_toe":"l_big_toe",
+        "l_big_toe":"r_big_toe",
+        "l_calc":"r_calc",
+        "r_calc":"l_calc",
+        "r_bpinky":"l_bpinky",
+        "l_bpinky":"r_bpinky",
+        "r_tpinky":"l_tpinky",
+        "l_tpinky":"r_tpinky",
+        "r_bindex":"l_bindex",
+        "l_bindex":"r_bindex",
+        "r_tindex":"l_tindex",
+        "l_tindex":"r_tindex",
+        "r_tmiddle":"l_tmiddle",
+        "l_tmiddle":"r_tmiddle",
+        "r_tring":"l_tring",
+        "l_tring":"r_tring",
+        "r_bthumb":"l_bthumb",
+        "l_bthumb":"r_bthumb",
+        "r_tthumb":"l_tthumb",
+        "l_tthumb":"r_tthumb",
+    }
+
+DET_CONFIG = "demo/mmdetection_cfg/configs/convnext/cascade-mask-rcnn_convnext-t-p4-w7_fpn_4conv1fc-giou_amp-ms-crop-3x_coco.py"
+DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/convnext/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco_20220509_204200-8f07c40b.pth"
 
 # DET_CONFIG = "demo/mmdetection_cfg/configs/yolo/yolov3_d53_8xb8-ms-608-273e_coco"
 # DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/retinanet/retinanet_r50_fpn_1x_coco/retinanet_r50_fpn_1x_coco_20200130-c2398f9e.pth"
@@ -29,20 +132,23 @@ from mmpose.utils import adapt_mmdet_pipeline
 # DET_CONFIG = "demo/mmdetection_cfg/mask_rcnn_r50_fpn_2x_coco.py"
 # DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_2x_coco/faster_rcnn_r50_fpn_2x_coco_bbox_mAP-0.384_20200504_210434-a5d8aa15.pth"
 
-DET_CONFIG = "demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py"
-DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth"
+# DET_CONFIG = "demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py"
+# DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth"
 
 # DET_CONFIG = "demo/mmdetection_cfg/yolov3_d53_320_273e_coco.py"
 # DET_CHECKPOINT = "https://download.openmmlab.com/mmdetection/v2.0/yolo/yolov3_d53_320_273e_coco/yolov3_d53_320_273e_coco-421362b6.pth"
 
-POSE_CONFIG = "configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_hrnet-w48_dark-8xb32-210e_merge_bedlam_infinity_eval_rich-384x288_pretrained.py"
-POSE_CHECKPOINT = "pretrain/hrnet/best_infinity_AP_epoch_18.pth"
+POSE_CONFIG = "configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_hrnet-w48_dark-8xb32-210e_merge_bedlam_infinity_eval_bedlam-384x288_pretrained.py"
+POSE_CHECKPOINT = "pretrain/hrnet/best_infinity_AP_epoch_21.pth"
 
-# POSE_CONFIG = "configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_ViTPose-huge_8xb64-210e_merge_bedlam_infinity_eval_rich-256x192.py"
-# POSE_CHECKPOINT = "pretrain/vit/best_infinity_AP_epoch_4.pth"
+# POSE_CONFIG = "configs/body_2d_keypoint/topdown_heatmap/coco/td-hm_hrnet-w32_dark-8xb64-210e_coco-256x192.py"
+# POSE_CHECKPOINT = 'mmpose_data/ckpts/td-hm_hrnet-w32_dark-8xb64-210e_coco-256x192-0e00bf12_20220914.pth'
+
+# # POSE_CONFIG = "configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_ViTPose-huge_8xb64-210e_merge_bedlam_infinity_eval_rich-256x192.py"
+# # POSE_CHECKPOINT = "pretrain/vit/best_infinity_AP_epoch_4.pth"
 
 OPENCAP_ROOT = "../OpenCap/data"
-OUTPUT_ROOT = "eval_opencap_output_hrnet_18e"
+OUTPUT_ROOT = "eval_opencap_output_hrnet_21e"
 
 BBOX_THR = 0.3
 NMS_THR = 0.3
@@ -91,7 +197,6 @@ def process_one_image(img, detector, pose_estimator, visualizer=None, show_inter
         img = mmcv.imread(img, channel_order="rgb")
     elif isinstance(img, np.ndarray):
         img = mmcv.bgr2rgb(img)
-    print("data_samples", data_samples)
     if visualizer is not None:
         visualizer.add_datasample(
             "result",
@@ -173,6 +278,9 @@ def main():
         f"{args.opencap_root}/**/*_syncdWithMocap.avi", recursive=True
     )
     for video_file in tqdm(video_synced_files):
+        print("video_file", video_file)
+        if "subject8" not in video_file or "DJAsym3" not in video_file or "Cam2" not in video_file:
+            continue
         output_file = os.path.join(
             args.output_root,
             video_file.replace(args.opencap_root, "")[1:],
@@ -182,6 +290,7 @@ def main():
             video_file.replace(args.opencap_root, "")[1:].replace(".avi", ".json"),
         )
         mmengine.mkdir_or_exist("/".join(output_file.split("/")[:-1]))
+        print("output_file", output_file)
         cap = cv2.VideoCapture(video_file)
 
         video_writer = None
@@ -195,6 +304,7 @@ def main():
             if not success:
                 break
 
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             # topdown pose estimation
             pred_instances = process_one_image(
                 frame, detector, pose_estimator, visualizer, 0.001
@@ -207,7 +317,44 @@ def main():
 
             # output videos
             if output_file and args.save_videos:
-                frame_vis = visualizer.get_image()
+                # frame_vis = visualizer.get_image()
+                for index_person in range(len(pred_instances["bboxes"])):
+                    bbox = pred_instances["bboxes"][index_person]
+                    kpts = pred_instances["keypoints"][index_person]
+                    # cv2.rectangle(
+                    #     frame,
+                    #     (int(bbox[0]), int(bbox[1])),
+                    #     (int(bbox[2]), int(bbox[3])),
+                    #     (0, 255, 0),
+                    #     2,
+                    # )
+                    for index_kpt in range(len(kpts)):
+
+
+
+                        if index_kpt < 17:
+                            continue
+                            color = (0, 0, 255)
+
+                        else:
+                            # continue
+                            if 31 <=index_kpt-17<=46 or markerNames[index_kpt-17] in ["l_calc","r_calc"]:
+                                continue
+                            if markerNames[index_kpt-17] in markerPairs.keys() :
+                                if markerNames[index_kpt-17][0] == "l":
+                                    color = (255, 0, 255)
+                                else:
+                                    color = (0 , 255, 255)
+                            else:
+                                color = (255, 0, 0)
+
+                        cv2.circle(
+                            frame,
+                            (int(kpts[index_kpt][0]), int(kpts[index_kpt][1])),
+                            3,
+                            color,
+                            -1,
+                        )
 
                 if video_writer is None:
                     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -217,10 +364,10 @@ def main():
                         output_file,
                         fourcc,
                         25,  # saved fps
-                        (frame_vis.shape[1], frame_vis.shape[0]),
+                        (frame.shape[1], frame.shape[0]),
                     )
 
-                video_writer.write(mmcv.rgb2bgr(frame_vis))
+                video_writer.write(mmcv.rgb2bgr(frame))
 
         if video_writer:
             video_writer.release()
