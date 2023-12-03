@@ -143,9 +143,8 @@ model = dict(
         ),
         init_cfg=dict(
             type="Pretrained",
-            # checkpoint="/scratch/users/yonigoz/mmpose_data/ckpts/hrnet/"
-            # "td-hm_hrnet-w32_dark-8xb64-210e_coco-256x192-0e00bf12_20220914.pth",
-            checkpoint="/scratch/users/yonigoz/mmpose_data/work_dirs/merge_bedlam_infinity_coco_3DPW_eval_bedlam_final/HRNet/w32_dark_bedlam/best_infinity_AP_epoch_21.pth",
+            checkpoint="/scratch/users/yonigoz/mmpose_data/ckpts/hrnet/"
+            "td-hm_hrnet-w32_dark-8xb64-210e_coco-256x192-0e00bf12_20220914.pth",
             prefix="backbone",
         ),
     ),
