@@ -3,6 +3,7 @@
 #SBATCH --output=vit_base_final.out
 #SBATCH --error=vit_base_final.err
 #SBATCH -p gpu
+#SBATCH --mem=16GB
 #SBATCH --nodes=1
 #SBATCH --gpus=1
 

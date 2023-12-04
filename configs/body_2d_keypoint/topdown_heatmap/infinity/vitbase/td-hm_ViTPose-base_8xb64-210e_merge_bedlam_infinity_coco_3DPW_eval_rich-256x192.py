@@ -335,7 +335,7 @@ vis_backends = [
         init_kwargs=dict(
             project="synthetic_finetuning",
             entity="yonigoz",
-            name="no_3DPW/ViT/base_pretrained",
+            name="final/ViT/base_pretrained",
         ),
     ),
 ]
