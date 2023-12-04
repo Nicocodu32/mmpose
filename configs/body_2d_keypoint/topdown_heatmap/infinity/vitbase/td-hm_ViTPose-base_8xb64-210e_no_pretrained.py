@@ -1,4 +1,4 @@
-_base_ = ["../../../_base_/default_runtime.py"]
+_base_ = ["../../../../_base_/default_runtime.py"]
 
 
 used_data_keys=[
@@ -273,8 +273,8 @@ train_dataloader = dict(
 
 dataset_type = "InfinityDataset"
 data_mode = "topdown"
-# data_root = "/scratch/users/yonigoz/RICH/full_test/downsampled/"
-data_root = "/scratch/users/yonigoz/BEDLAM/data/"
+data_root = ""
+# data_root = "/scratch/users/yonigoz/BEDLAM/data/"
 
 val_dataloader = dict(
     batch_size=8,
@@ -286,9 +286,9 @@ val_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file="val_annotations.json",
-        data_prefix=dict(img="eval_images/"),
-        # data_prefix=dict(img=""),
+        ann_file="/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
+        # data_prefix=dict(img="eval_images/"),
+        data_prefix=dict(img=""),
         test_mode=True,
         pipeline=val_pipeline,
         used_data_keys=used_data_keys,
@@ -300,19 +300,19 @@ test_dataloader = val_dataloader
 val_evaluator = [
     dict(
         type="InfinityMetric",
-        ann_file=data_root + "val_annotations.json",
+        ann_file=data_root + "/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
         use_area=False,
         used_data_keys=used_data_keys,
     ),
     dict(
         type="InfinityCocoMetric",
-        ann_file=data_root + "val_annotations.json",
+        ann_file=data_root + "/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
         use_area=False,
         used_data_keys=used_data_keys,
     ),
     dict(
         type="InfinityAnatomicalMetric",
-        ann_file=data_root + "val_annotations.json",
+        ann_file=data_root + "/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
         use_area=False,
         used_data_keys=used_data_keys,
     ),
