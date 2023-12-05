@@ -262,14 +262,14 @@ combined_dataset = dict(
 
 train_sampler = dict(
     type="MultiSourceSampler",
-    batch_size=8,
+    batch_size=32,
     source_ratio=[1, 1, 1, 1],
     shuffle=True,
 )
 
 # data loaders
 train_dataloader = dict(
-    batch_size=8,
+    batch_size=32,
     num_workers=4,
     persistent_workers=True,
     sampler=train_sampler,
@@ -283,7 +283,7 @@ data_root = ""
 # data_root = "/scratch/users/yonigoz/BEDLAM/data/"
 
 val_dataloader = dict(
-    batch_size=8,
+    batch_size=32,
     num_workers=4,
     persistent_workers=True,
     drop_last=False,
