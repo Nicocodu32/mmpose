@@ -1,7 +1,7 @@
 #!/usr/bin/bash
-#SBATCH --job-name=hrnet32_final
-#SBATCH --output=hrnet32_final.out
-#SBATCH --error=hrnet32_final.err
+#SBATCH --job-name=hrnet48_final
+#SBATCH --output=hrnet48_final.out
+#SBATCH --error=hrnet48_final.err
 #SBATCH -p gpu
 #SBATCH --nodes=1
 #SBATCH --gpus=1

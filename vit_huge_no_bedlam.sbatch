@@ -9,6 +9,6 @@
 #SBATCH --mem=16GB
 #SBATCH --time=48:00:00
 
-python3 tools/train.py configs/body_2d_keypoint/topdown_heatmap/infinity/vithuge/td-hm_ViTPose-huge_8xb64-210e_no_bedlam.py --amp
+python3 tools/train.py configs/body_2d_keypoint/topdown_heatmap/infinity/vithuge/td-hm_ViTPose-huge_8xb64-210e_no_bedlam.py --amp --resume
 
 
