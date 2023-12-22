@@ -9,6 +9,6 @@
 #SBATCH --mem=16GB
 #SBATCH --time=48:00:00
 
-python3 tools/train.py configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_hrnet-w32_dark-8xb64-210e_merge_bedlam_infinity_coco_3DPW_eval_rich-384x288_pretrained.py --amp --resume
+python3 tools/train.py configs/body_2d_keypoint/topdown_heatmap/infinity/hrnet32/td-hm_hrnet-w32_dark-8xb64-210e_merge_bedlam_infinity_coco_3DPW_eval_rich-384x288_pretrained.py --amp --resume
 
 
