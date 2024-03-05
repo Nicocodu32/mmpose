@@ -361,9 +361,9 @@ vis_backends = [
         ),
     ),
 ]
-visualizer = dict(
-    type="PoseLocalVisualizer", vis_backends=vis_backends, name="visualizer"
-)
+# visualizer = dict(
+#     type="PoseLocalVisualizer", vis_backends=vis_backends, name="visualizer"
+# )
 
 default_hooks = dict(
     timer=dict(type="IterTimerHook"),
@@ -371,7 +371,7 @@ default_hooks = dict(
     param_scheduler=dict(type="ParamSchedulerHook"),
     checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2),
     sampler_seed=dict(type="DistSamplerSeedHook"),
-    visualization=dict(type="PoseVisualizationHook", enable=True, interval=500),
+    # visualization=dict(type="PoseVisualizationHook", enable=True, interval=500),
 )
 
 work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_bedlam_infinity_coco_3DPW_eval_bedlam_final/HRNet/w48_dark_pretrained"
