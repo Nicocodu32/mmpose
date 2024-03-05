@@ -352,7 +352,7 @@ default_hooks = dict(
     param_scheduler=dict(type="ParamSchedulerHook"),
     checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2),
     sampler_seed=dict(type="DistSamplerSeedHook"),
-    visualization=dict(type="PoseVisualizationHook", enable=True, interval=20),
+    # visualization=dict(type="PoseVisualizationHook", enable=True, interval=20),
 )
 
 work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/no_pretrained/ViT/base_pretrained"
