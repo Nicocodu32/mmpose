@@ -329,6 +329,15 @@ val_evaluator = [
         use_area=False,
         used_data_keys=used_data_keys,
     ),
+    dict(
+        type="PCKAccuracy", prefix="at0.05_",
+    ),
+    dict(
+        type="PCKAccuracy", thr=0.1, prefix="at0.1_"
+    ),
+    dict(
+        type="PCKAccuracy", thr=0.2, prefix="at0.2_"
+    ),
 ]
 
 test_evaluator = val_evaluator
