@@ -361,9 +361,9 @@ vis_backends = [
         ),
     ),
 ]
-# visualizer = dict(
-#     type="PoseLocalVisualizer", vis_backends=vis_backends, name="visualizer"
-# )
+visualizer = dict(
+    type="PoseLocalVisualizer", vis_backends=vis_backends, name="visualizer"
+)
 
 default_hooks = dict(
     timer=dict(type="IterTimerHook"),
