@@ -298,24 +298,24 @@ test_dataloader = val_dataloader
 
 # evaluators
 val_evaluator = [
-    dict(
-        type="InfinityMetric",
-        ann_file="/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
-        use_area=False,
-        used_data_keys=used_data_keys,
-    ),
-    dict(
-        type="InfinityCocoMetric",
-        ann_file="/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
-        use_area=False,
-        used_data_keys=used_data_keys,
-    ),
-    dict(
-        type="InfinityAnatomicalMetric",
-        ann_file="/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
-        use_area=False,
-        used_data_keys=used_data_keys,
-    ),
+    # dict(
+    #     type="InfinityMetric",
+    #     ann_file="/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
+    #     use_area=False,
+    #     used_data_keys=used_data_keys,
+    # ),
+    # dict(
+    #     type="InfinityCocoMetric",
+    #     ann_file="/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
+    #     use_area=False,
+    #     used_data_keys=used_data_keys,
+    # ),
+    # dict(
+    #     type="InfinityAnatomicalMetric",
+    #     ann_file="/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
+    #     use_area=False,
+    #     used_data_keys=used_data_keys,
+    # ),
     dict(
         type="PCKAccuracy", prefix="at0.05_",
     ),
