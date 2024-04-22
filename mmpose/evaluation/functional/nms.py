@@ -7,6 +7,10 @@
 from typing import List, Optional
 
 import numpy as np
+import torch
+from torch import Tensor
+
+from mmpose.structures.bbox import bbox_overlaps
 
 
 def nms(dets: np.ndarray, thr: float) -> List[int]:
@@ -254,7 +258,7 @@ def soft_oks_nms(kpts_db: List[dict],
 
 def nearby_joints_nms(
     kpts_db: List[dict],
-    dist_thr: float,
+    dist_thr: float = 0.05,
     num_nearby_joints_thr: Optional[int] = None,
     score_per_joint: bool = False,
     max_dets: int = 30,
@@ -267,9 +271,10 @@ def nearby_joints_nms(
     Args:
         kpts_db (list[dict]): keypoints and scores.
         dist_thr (float): threshold for judging whether two joints are close.
+            Defaults to 0.05.
         num_nearby_joints_thr (int): threshold for judging whether two
             instances are close.
-        max_dets (int): max number of detections to keep.
+        max_dets (int): max number of detections to keep. Defaults to 30.
         score_per_joint (bool): the input scores (in kpts_db) are per joint
             scores.
 
@@ -325,3 +330,40 @@ def nearby_joints_nms(
         keep_pose_inds = [keep_pose_inds[i] for i in sub_inds]
 
     return keep_pose_inds
+
+
+def nms_torch(bboxes: Tensor,
+              scores: Tensor,
+              threshold: float = 0.65,
+              iou_calculator=bbox_overlaps,
+              return_group: bool = False):
+    """Perform Non-Maximum Suppression (NMS) on a set of bounding boxes using
+    their corresponding scores.
+
+    Args:
+
+        bboxes (Tensor): list of bounding boxes (each containing 4 elements
+            for x1, y1, x2, y2).
+        scores (Tensor): scores associated with each bounding box.
+        threshold (float): IoU threshold to determine overlap.
+        iou_calculator (function): method to calculate IoU.
+        return_group (bool): if True, returns groups of overlapping bounding
+            boxes, otherwise returns the main bounding boxes.
+    """
+
+    _, indices = scores.sort(descending=True)
+    groups = []
+    while len(indices):
+        idx, indices = indices[0], indices[1:]
+        bbox = bboxes[idx]
+        ious = iou_calculator(bbox, bboxes[indices])
+        close_indices = torch.where(ious > threshold)[1]
+        keep_indices = torch.ones_like(indices, dtype=torch.bool)
+        keep_indices[close_indices] = 0
+        groups.append(torch.cat((idx[None], indices[close_indices])))
+        indices = indices[keep_indices]
+
+    if return_group:
+        return groups
+    else:
+        return torch.cat([g[:1] for g in groups])

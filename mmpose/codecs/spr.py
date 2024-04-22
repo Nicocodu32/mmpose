@@ -73,6 +73,13 @@ class SPR(BaseKeypointCodec):
         https://arxiv.org/abs/1908.09220
     """
 
+    field_mapping_table = dict(
+        heatmaps='heatmaps',
+        heatmap_weights='heatmap_weights',
+        displacements='displacements',
+        displacement_weights='displacement_weights',
+    )
+
     def __init__(
         self,
         input_size: Tuple[int, int],
@@ -131,7 +138,7 @@ class SPR(BaseKeypointCodec):
         Returns:
             np.ndarray: Heatmap weight array in the same shape with heatmaps
         """
-        heatmap_weights = np.ones(heatmaps.shape) * bg_weight
+        heatmap_weights = np.ones(heatmaps.shape, dtype=np.float32) * bg_weight
         heatmap_weights[heatmaps > 0] = fg_weight
         return heatmap_weights
 

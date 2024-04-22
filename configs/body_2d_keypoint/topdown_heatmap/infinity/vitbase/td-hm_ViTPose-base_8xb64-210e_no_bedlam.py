@@ -304,23 +304,32 @@ test_dataloader = val_dataloader
 
 # evaluators
 val_evaluator = [
+    # dict(
+    #     type="InfinityMetric",
+    #     ann_file=data_root + "/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
+    #     use_area=False,
+    #     used_data_keys=used_data_keys,
+    # ),
+    # dict(
+    #     type="InfinityCocoMetric",
+    #     ann_file=data_root + "/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
+    #     use_area=False,
+    #     used_data_keys=used_data_keys,
+    # ),
+    # dict(
+    #     type="InfinityAnatomicalMetric",
+    #     ann_file=data_root + "/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
+    #     use_area=False,
+    #     used_data_keys=used_data_keys,
+    # ),
     dict(
-        type="InfinityMetric",
-        ann_file=data_root + "/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
-        use_area=False,
-        used_data_keys=used_data_keys,
+        type="PCKAccuracy", prefix="at0.05_",
     ),
     dict(
-        type="InfinityCocoMetric",
-        ann_file=data_root + "/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
-        use_area=False,
-        used_data_keys=used_data_keys,
+        type="PCKAccuracy", thr=0.1, prefix="at0.1_"
     ),
     dict(
-        type="InfinityAnatomicalMetric",
-        ann_file=data_root + "/scratch/users/yonigoz/RICH/downsampled/val_annotations.json",
-        use_area=False,
-        used_data_keys=used_data_keys,
+        type="PCKAccuracy", thr=0.2, prefix="at0.2_"
     ),
 ]
 
@@ -349,7 +358,7 @@ default_hooks = dict(
     param_scheduler=dict(type="ParamSchedulerHook"),
     checkpoint=dict(save_best="infinity/AP", rule="greater", max_keep_ckpts=2),
     sampler_seed=dict(type="DistSamplerSeedHook"),
-    visualization=dict(type="PoseVisualizationHook", enable=True, interval=20),
+    # visualization=dict(type="PoseVisualizationHook", enable=True, interval=20),
 )
 
 work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/no_bedlam/ViT/base_pretrained"

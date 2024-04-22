@@ -1,4 +1,4 @@
-_base_ = ["../../../_base_/default_runtime.py"]
+_base_ = ["../../../../_base_/default_runtime.py"]
 
 used_data_keys=[
         "nose",
@@ -283,26 +283,35 @@ test_dataloader = val_dataloader
 
 # evaluators
 val_evaluator = [
+    # dict(
+    #     type="InfinityMetric",
+    #     ann_file=data_root
+    #     + "combined_dataset_15fps/test/annotations.json",
+    #     use_area=False,
+    #     used_data_keys=used_data_keys,
+    # ),
+    # dict(
+    #     type="InfinityCocoMetric",
+    #     ann_file=data_root
+    #     + "combined_dataset_15fps/test/annotations.json",
+    #     use_area=False,
+    #     used_data_keys=used_data_keys,
+    # ),
+    # dict(
+    #     type="InfinityAnatomicalMetric",
+    #     ann_file=data_root
+    #     + "combined_dataset_15fps/test/annotations.json",
+    #     use_area=False,
+    #     used_data_keys=used_data_keys,
+    # ),
     dict(
-        type="InfinityMetric",
-        ann_file=data_root
-        + "combined_dataset_15fps/test/annotations.json",
-        use_area=False,
-        used_data_keys=used_data_keys,
+        type="PCKAccuracy", prefix="at0.05_",
     ),
     dict(
-        type="InfinityCocoMetric",
-        ann_file=data_root
-        + "combined_dataset_15fps/test/annotations.json",
-        use_area=False,
-        used_data_keys=used_data_keys,
+        type="PCKAccuracy", thr=0.1, prefix="at0.1_"
     ),
     dict(
-        type="InfinityAnatomicalMetric",
-        ann_file=data_root
-        + "combined_dataset_15fps/test/annotations.json",
-        use_area=False,
-        used_data_keys=used_data_keys,
+        type="PCKAccuracy", thr=0.2, prefix="at0.2_"
     ),
 ]
 

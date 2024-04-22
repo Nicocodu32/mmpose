@@ -1,5 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -20,8 +20,8 @@ def flip_keypoints(keypoints: np.ndarray,
     Args:
         keypoints (np.ndarray): Keypoints in shape (..., K, D)
         keypoints_visible (np.ndarray, optional): The visibility of keypoints
-            in shape (..., K, 1). Set ``None`` if the keypoint visibility is
-            unavailable
+            in shape (..., K, 1) or (..., K, 2). Set ``None`` if the keypoint
+            visibility is unavailable
         image_size (tuple): The image shape in [w, h]
         flip_indices (List[int]): The indices of each keypoint's symmetric
             keypoint
@@ -33,11 +33,12 @@ def flip_keypoints(keypoints: np.ndarray,
         - keypoints_flipped (np.ndarray): Flipped keypoints in shape
             (..., K, D)
         - keypoints_visible_flipped (np.ndarray, optional): Flipped keypoints'
-            visibility in shape (..., K, 1). Return ``None`` if the input
-            ``keypoints_visible`` is ``None``
+            visibility in shape (..., K, 1) or (..., K, 2). Return ``None`` if
+            the input ``keypoints_visible`` is ``None``
     """
 
-    assert keypoints.shape[:-1] == keypoints_visible.shape, (
+    ndim = keypoints.ndim
+    assert keypoints.shape[:-1] == keypoints_visible.shape[:ndim - 1], (
         f'Mismatched shapes of keypoints {keypoints.shape} and '
         f'keypoints_visible {keypoints_visible.shape}')
 
@@ -48,9 +49,10 @@ def flip_keypoints(keypoints: np.ndarray,
 
     # swap the symmetric keypoint pairs
     if direction == 'horizontal' or direction == 'vertical':
-        keypoints = keypoints[..., flip_indices, :]
+        keypoints = keypoints.take(flip_indices, axis=ndim - 2)
         if keypoints_visible is not None:
-            keypoints_visible = keypoints_visible[..., flip_indices]
+            keypoints_visible = keypoints_visible.take(
+                flip_indices, axis=ndim - 2)
 
     # flip the keypoints
     w, h = image_size
@@ -69,7 +71,7 @@ def flip_keypoints_custom_center(keypoints: np.ndarray,
                                  flip_indices: List[int],
                                  center_mode: str = 'static',
                                  center_x: float = 0.5,
-                                 center_index: int = 0):
+                                 center_index: Union[int, List] = 0):
     """Flip human joints horizontally.
 
     Note:
@@ -89,9 +91,9 @@ def flip_keypoints_custom_center(keypoints: np.ndarray,
             Defaults: ``'static'``.
         center_x (float): Set the x-axis location of the flip center. Only used
             when ``center_mode`` is ``'static'``. Defaults: 0.5.
-        center_index (int): Set the index of the root joint, whose x location
-            will be used as the flip center. Only used when ``center_mode`` is
-            ``'root'``. Defaults: 0.
+        center_index (Union[int, List]): Set the index of the root joint, whose
+            x location will be used as the flip center. Only used when
+            ``center_mode`` is ``'root'``. Defaults: 0.
 
     Returns:
         np.ndarray([..., K, C]): Flipped joints.
@@ -106,8 +108,10 @@ def flip_keypoints_custom_center(keypoints: np.ndarray,
     if center_mode == 'static':
         x_c = center_x
     elif center_mode == 'root':
-        assert keypoints.shape[-2] > center_index
-        x_c = keypoints[..., center_index, 0]
+        center_index = [center_index] if isinstance(center_index, int) else \
+            center_index
+        assert keypoints.shape[-2] > max(center_index)
+        x_c = keypoints[..., center_index, 0].mean(axis=-1)
 
     keypoints_flipped = keypoints.copy()
     keypoints_visible_flipped = keypoints_visible.copy()
@@ -119,3 +123,33 @@ def flip_keypoints_custom_center(keypoints: np.ndarray,
     # Flip horizontally
     keypoints_flipped[..., 0] = x_c * 2 - keypoints_flipped[..., 0]
     return keypoints_flipped, keypoints_visible_flipped
+
+
+def keypoint_clip_border(keypoints: np.ndarray, keypoints_visible: np.ndarray,
+                         shape: Tuple[int,
+                                      int]) -> Tuple[np.ndarray, np.ndarray]:
+    """Set the visibility values for keypoints outside the image border.
+
+    Args:
+        keypoints (np.ndarray): Input keypoints coordinates.
+        keypoints_visible (np.ndarray): Visibility values of keypoints.
+        shape (Tuple[int, int]): Shape of the image to which keypoints are
+            being clipped in the format of (w, h).
+
+    Note:
+        This function sets the visibility values of keypoints that fall outside
+            the specified frame border to zero (0.0).
+    """
+    width, height = shape[:2]
+
+    # Create a mask for keypoints outside the frame
+    outside_mask = ((keypoints[..., 0] > width) | (keypoints[..., 0] < 0) |
+                    (keypoints[..., 1] > height) | (keypoints[..., 1] < 0))
+
+    # Update visibility values for keypoints outside the frame
+    if keypoints_visible.ndim == 2:
+        keypoints_visible[outside_mask] = 0.0
+    elif keypoints_visible.ndim == 3:
+        keypoints_visible[outside_mask, 0] = 0.0
+
+    return keypoints, keypoints_visible

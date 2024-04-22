@@ -137,13 +137,17 @@ class MpiiDataset(BaseCocoStyleDataset):
     def _load_annotations(self) -> Tuple[List[dict], List[dict]]:
         """Load data from annotations in MPII format."""
 
-        assert exists(self.ann_file), 'Annotation file does not exist'
+        assert exists(self.ann_file), (
+            f'Annotation file `{self.ann_file}` does not exist')
+
         with get_local_path(self.ann_file) as local_path:
             with open(local_path) as anno_file:
                 self.anns = json.load(anno_file)
 
         if self.headbox_file:
-            assert exists(self.headbox_file), 'Headbox file does not exist'
+            assert exists(self.headbox_file), (
+                f'Headbox file `{self.headbox_file}` does not exist')
+
             with get_local_path(self.headbox_file) as local_path:
                 self.headbox_dict = loadmat(local_path)
             headboxes_src = np.transpose(self.headbox_dict['headboxes_src'],
@@ -177,8 +181,15 @@ class MpiiDataset(BaseCocoStyleDataset):
             bbox = bbox_cs2xyxy(center, scale)
 
             # load keypoints in shape [1, K, 2] and keypoints_visible in [1, K]
-            keypoints = np.array(ann['joints']).reshape(1, -1, 2)
+            keypoints = np.array(
+                ann['joints'], dtype=np.float32).reshape(1, -1, 2)
             keypoints_visible = np.array(ann['joints_vis']).reshape(1, -1)
+
+            x1, y1, x2, y2 = np.split(bbox, axis=1, indices_or_sections=4)
+            area = np.clip((x2 - x1) * (y2 - y1) * 0.53, a_min=1.0, a_max=None)
+            area = area[..., 0].astype(np.float32)
+
+            category_id = ann.get('category_id', [1] * len(bbox))
 
             instance_info = {
                 'id': ann_id,
@@ -190,6 +201,8 @@ class MpiiDataset(BaseCocoStyleDataset):
                 'bbox_score': np.ones(1, dtype=np.float32),
                 'keypoints': keypoints,
                 'keypoints_visible': keypoints_visible,
+                'area': area,
+                'category_id': category_id,
             }
 
             if self.headbox_file:
