@@ -193,19 +193,19 @@ dataset_bedlam = dict(
     used_data_keys=used_data_keys,
 )
 
-dataset_type = "InfinityDataset"
-data_mode = "topdown"
-data_root = "/scratch/users/yonigoz/"
+# dataset_type = "InfinityDataset"
+# data_mode = "topdown"
+# data_root = "/scratch/users/yonigoz/"
 
-dataset_3DPW = dict(
-    type=dataset_type,
-    data_root=data_root,
-    data_mode=data_mode,
-    ann_file="3DPW/train_annotations.json",
-    data_prefix=dict(img=""),
-    pipeline=[],
-    used_data_keys=used_data_keys,
-)
+# dataset_3DPW = dict(
+#     type=dataset_type,
+#     data_root=data_root,
+#     data_mode=data_mode,
+#     ann_file="3DPW/train_annotations.json",
+#     data_prefix=dict(img=""),
+#     pipeline=[],
+#     used_data_keys=used_data_keys,
+# )
 
 dataset_type = "CocoWholeBodyDataset"
 data_mode = "topdown"
@@ -273,7 +273,8 @@ test_pipeline = val_pipeline
 combined_dataset = dict(
     type="CombinedDataset",
     metainfo=dict(from_file="configs/_base_/datasets/infinity.py"),
-    datasets=[dataset_infinity, dataset_bedlam, dataset_3DPW, dataset_coco_wholebody],
+    # datasets=[dataset_infinity, dataset_bedlam, dataset_3DPW, dataset_coco_wholebody],
+    datasets=[dataset_infinity, dataset_bedlam, dataset_coco_wholebody],
     pipeline=train_pipeline,
     used_data_keys=used_data_keys,
     test_mode=False,
@@ -282,7 +283,8 @@ combined_dataset = dict(
 train_sampler = dict(
     type="MultiSourceSampler",
     batch_size=32,
-    source_ratio=[1, 1, 1, 1],
+    # source_ratio=[1, 1, 1, 1],
+    source_ratio=[1, 1, 1],
     shuffle=True,
 )
 
