@@ -1,6 +1,7 @@
 # Perso
 
 pretrain/
+demo/mmdetection_cfg/configs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
