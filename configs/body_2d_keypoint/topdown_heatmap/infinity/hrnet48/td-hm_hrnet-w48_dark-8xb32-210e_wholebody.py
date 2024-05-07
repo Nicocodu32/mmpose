@@ -144,7 +144,7 @@ model = dict(
         init_cfg=dict(
             type="Pretrained",
             checkpoint="/scratch/users/yonigoz/mmpose_data/ckpts/hrnet/"
-            "hrnet_w48_coco_wholebody_384x288_dark-f5726563_20200918.pth",
+            "td-hm_hrnet-w48_dark-8xb32-210e_coco-384x288-39c3c381_20220916.pth",
             prefix="backbone",
         ),
     ),
