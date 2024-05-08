@@ -75,9 +75,8 @@ model = dict(
                 num_channels=(48, 96, 192, 384))),
         init_cfg=dict(
             type='Pretrained',
-            checkpoint="/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/mmpose/pretrain/coco/td-hm_hrnet-w48_dark-8xb32-210e_coco-384x288-39c3c381_20220916.pth",
-            prefix='backbone',
-        )
+            checkpoint='https://download.openmmlab.com/mmpose/'
+            'pretrain_models/hrnet_w48-8ef0771d.pth'),
     ),
     head=dict(
         type='HeatmapHead',
