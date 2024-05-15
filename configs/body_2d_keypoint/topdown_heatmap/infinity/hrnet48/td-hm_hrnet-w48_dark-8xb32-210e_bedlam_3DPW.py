@@ -300,7 +300,7 @@ vis_backends = [
         init_kwargs=dict(
             project="synthetic_finetuning",
             entity="yonigoz",
-            name="wholebody/HRNet/w48_dark_pretrained",
+            name="bedlam_3DPW/HRNet/w48_dark_no_pretrained",
         ),
     ),
 ]
@@ -317,4 +317,4 @@ default_hooks = dict(
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=500),
 )
 
-work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/wholebody/HRNet/w48_dark_pretrained"
+work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/bedlam_3DPW/HRNet/w48_dark_pretrained"
