@@ -141,6 +141,12 @@ model = dict(
                 num_channels=(48, 96, 192, 384),
             ),
         ),
+        init_cfg=dict(
+            type="Pretrained",
+            checkpoint="/scratch/users/yonigoz/mmpose_data/ckpts/hrnet/"
+            "td-hm_hrnet-w48_dark-8xb32-210e_coco-384x288-39c3c381_20220916.pth",
+            prefix="backbone",
+        ),
     ),
     head=dict(
         type="HeatmapHead",
@@ -300,7 +306,7 @@ vis_backends = [
         init_kwargs=dict(
             project="synthetic_finetuning",
             entity="yonigoz",
-            name="bedlam_3DPW/HRNet/w48_dark_no_pretrained",
+            name="bedlam_3DPW/HRNet/w48_dark_pretrained",
         ),
     ),
 ]
@@ -317,4 +323,4 @@ default_hooks = dict(
     visualization=dict(type="PoseVisualizationHook", enable=True, interval=500),
 )
 
-work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/bedlam_3DPW/HRNet/w48_dark_pretrained"
+work_dir = "/scratch/users/yonigoz/mmpose_data/work_dirs/bedlam_3DPW_pretrained/HRNet/w48_dark_pretrained"
