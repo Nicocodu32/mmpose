@@ -67,7 +67,7 @@ def dataset_meta_from_config(config: Config,
 
 def init_model(config: Union[str, Path, Config],
                checkpoint: Optional[str] = None,
-               device: str = 'cuda:0',
+               device: str = 'cpu',
                cfg_options: Optional[dict] = None) -> nn.Module:
     """Initialize a pose estimator from a config file.
 
@@ -126,7 +126,6 @@ def init_model(config: Union[str, Path, Config],
     model.dataset_meta = dataset_meta
 
     model.cfg = config  # save the config in the model for convenience
-    model.to(device)
     model.eval()
     return model
 

@@ -54,6 +54,7 @@ class CombinedDataset(BaseDataset):
 
         super(CombinedDataset, self).__init__(pipeline=pipeline, **kwargs)
         self._metainfo = parse_pose_metainfo(metainfo)
+        self._metainfo = parse_pose_metainfo(metainfo, used_data_keys = used_data_keys)
 
     @property
     def metainfo(self):
