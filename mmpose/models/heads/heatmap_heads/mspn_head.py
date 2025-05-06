@@ -394,9 +394,7 @@ class MSPNHead(BaseHead):
 
         keypoint_weights = torch.cat([
             d.gt_instance_labels.keypoint_weights for d in batch_data_samples
-        ],
-                                     dim=1)
-        keypoint_weights = keypoint_weights.transpose(0, 1)  # [B*N, L, K]
+        ]) # shape: [B*N, L, K]
 
         # calculate losses over multiple stages and multiple units
         losses = dict()

@@ -210,8 +210,6 @@ class BaseCocoStyleDataset(BaseDataset):
                 data_list = self._get_bottomup_data_infos(
                     instance_list, image_list)
 
-        if hasattr(self, 'coco'):
-            del self.coco
         return data_list
 
     def _load_annotations(self) -> Tuple[List[dict], List[dict]]:

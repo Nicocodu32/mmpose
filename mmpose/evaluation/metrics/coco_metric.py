@@ -91,7 +91,6 @@ class CocoMetric(BaseMetric):
             If prefix is not provided in the argument, ``self.default_prefix``
             will be used instead. Defaults to ``None``
     """
-    default_prefix: Optional[str] = 'coco'
 
     def __init__(self,
                  ann_file: Optional[str] = None,

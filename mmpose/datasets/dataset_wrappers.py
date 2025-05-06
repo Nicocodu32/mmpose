@@ -27,6 +27,7 @@ class CombinedDataset(BaseDataset):
                  metainfo: dict,
                  datasets: list,
                  pipeline: List[Union[dict, Callable]] = [],
+                 used_data_keys = None,
                  sample_ratio_factor: Optional[List[float]] = None,
                  **kwargs):
 
@@ -53,7 +54,6 @@ class CombinedDataset(BaseDataset):
         self._len = sum(self._lens)
 
         super(CombinedDataset, self).__init__(pipeline=pipeline, **kwargs)
-        self._metainfo = parse_pose_metainfo(metainfo)
         self._metainfo = parse_pose_metainfo(metainfo, used_data_keys = used_data_keys)
 
     @property

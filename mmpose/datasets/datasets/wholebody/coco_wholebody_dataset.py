@@ -120,7 +120,6 @@ class CocoWholeBodyDataset(BaseCocoStyleDataset):
             'bbox_score': np.ones(1, dtype=np.float32),
             'num_keypoints': num_keypoints,
             'keypoints': keypoints,
-            'keypoints_3d': None,
             'keypoints_visible': keypoints_visible,
             'iscrowd': ann['iscrowd'],
             'segmentation': ann['segmentation'],
