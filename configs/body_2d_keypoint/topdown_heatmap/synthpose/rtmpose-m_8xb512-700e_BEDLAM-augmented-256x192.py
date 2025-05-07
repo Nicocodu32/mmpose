@@ -1,36 +1,36 @@
 _base_ = ['../../../_base_/default_runtime.py']
 
 used_data_keys=[
-    "Nose",
-    "LEye",
-    "REye",
-    "LEar",
-    "REar",
-    "LShoulder",
-    "RShoulder",
-    "LElbow",
-    "RElbow",
-    "LWrist",
-    "RWrist",
-    "LHip",
-    "RHip",
-    "LKnee",
-    "Rknee",
-    "LAnkle",
-    "RAnkle",
-    "Head",
-    "Neck",
-    "Hip",
-    "LBigToe",
-    "RBigToe",
-    "LSmallToe",
-    "RSmallToe",
-    "LHeel",
-    "RHeel",
-    "r_bpinky",
+    "nose",
+    "left_eye",
+    "right_eye",
+    "left_ear",
+    "right_ear",
+    "left_shoulder",
+    "right_shoulder",
+    "left_elbow",
+    "right_elbow",
+    "left_wrist",
+    "right_wrist",
+    "left_hip",
+    "right_hip",
+    "left_knee",
+    "right_knee",
+    "left_ankle",
+    "right_ankle",
+    "head",
+    "neck",
+    "hip",
+    "left_big_toe",
+    "left_small_toe",
+    "left_heel",
+    "right_big_toe",
+    "right_small_toe",
+    "right_heel",
     "l_bpinky",
-    "r_bindex",
     "l_bindex",
+    "r_bpinky",
+    "r_bindex",
     ]
 
 
@@ -137,9 +137,9 @@ model = dict(
     test_cfg=dict(flip_test=True))
 
 # base dataset settings
-dataset_type = 'InfinityDataset'
+dataset_type = 'BEDLAMDataset'
 data_mode = 'topdown'
-data_root = '/home/ngouget/Codes/OpenCapBench/bedlam_reannotated/'
+data_root = '../BEDLAM_reannotated_COSMIK/'
 
 backend_args = dict(backend='local')
 
