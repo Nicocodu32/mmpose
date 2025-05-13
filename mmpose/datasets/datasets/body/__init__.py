@@ -13,6 +13,7 @@ from .mpii_trb_dataset import MpiiTrbDataset
 from .ochuman_dataset import OCHumanDataset
 from .posetrack18_dataset import PoseTrack18Dataset
 from .posetrack18_video_dataset import PoseTrack18VideoDataset
+from .halpe26aug_dataset import Halpe26augDataset
 
 __all__ = [
     "CocoDataset",
@@ -29,4 +30,5 @@ __all__ = [
     "InfinityDataset",
     'HumanArt21Dataset',
     'ExlposeDataset',
+    'Halpe26augDataset',
 ]
