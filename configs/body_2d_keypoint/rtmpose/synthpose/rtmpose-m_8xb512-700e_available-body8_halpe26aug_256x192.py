@@ -205,7 +205,7 @@ train_pipeline_stage2 = [
 # base dataset settings
 dataset_type = 'CocoWholeBodyDataset'
 data_mode = 'topdown'
-data_root = '../coco_annotations/'
+data_root = '../../datasets/HPE_training_data/coco_wholebody_2017/'
 
 # mapping to halpe26aug
 coco_halpe26aug = [(i, i) for i in range(17)] + [(17, 20), (18, 22), (19, 24),
@@ -245,15 +245,15 @@ val_coco = dict(
 # bedlam dataset settings
 dataset_type = 'Halpe26augDataset'
 data_mode = 'topdown'
-data_root = '../BEDLAM_reannotated_COSMIK/'
+data_root = '../../datasets/HPE_training_data/bedlam/data/'
 
 # train bedlam dataset
 dataset_bedlam = dict(
     type=dataset_type,
     data_root=data_root,
     data_mode=data_mode,
-    ann_file='annotations/train_annotations.json',
-    data_prefix=dict(img='train_images/'),
+    ann_file='bedlam_labels/bedlam_reannotated/training_annotations_16kpts.json',
+    data_prefix=dict(img='training_images/'),
     pipeline=[],
 )
 
@@ -262,15 +262,15 @@ val_bedlam = dict(
     type=dataset_type,
     data_root=data_root,
     data_mode=data_mode,
-    ann_file='annotations/val_annotations.json',
-    data_prefix=dict(img='val_images/'),
+    ann_file='bedlam_labels/bedlam_reannotated/validation_annotations_16kpts.json',
+    data_prefix=dict(img='validation_images/'),
     pipeline=[],
 )
 
 # crowdpose dataset settings
 dataset_type = 'CrowdPoseDataset'
 data_mode = 'topdown'
-data_root = '../crowdpose/'
+data_root = '../../datasets/HPE_training_data/crowdpose/'
 
 # mapping to halpe26aug
 crowdpose_halpe26aug = [(0, 5), (1, 6), (2, 7), (3, 8), (4, 9), (5, 10), (6, 11),
@@ -308,7 +308,7 @@ val_crowdpose = dict(
 # mpii dataset settings
 dataset_type = 'MpiiDataset'
 data_mode = 'topdown'
-data_root = '../mpii/'
+data_root = '../../datasets/HPE_training_data/mpii/'
 
 mpii_halpe26aug = [
     (0, 16),
@@ -358,7 +358,7 @@ val_mpii = dict(
 # ochuman dataset settings
 dataset_type = 'OCHumanDataset'
 data_mode = 'topdown'
-data_root = '../ochuman/'
+data_root = '../../datasets/HPE_training_data/ochuman/'
 
 ochuman_halpe26aug = [(i, i) for i in range(17)]
 

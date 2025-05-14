@@ -205,7 +205,7 @@ train_pipeline_stage2 = [
 # base dataset settings
 dataset_type = 'CocoWholeBodyDataset'
 data_mode = 'topdown'
-data_root = '../coco_annotations/'
+data_root = '../../datasets/HPE_training_data/coco_wholebody_2017/'
 
 # mapping to halpe26aug
 coco_halpe26aug = [(i, i) for i in range(17)] + [(17, 20), (18, 22), (19, 24),
