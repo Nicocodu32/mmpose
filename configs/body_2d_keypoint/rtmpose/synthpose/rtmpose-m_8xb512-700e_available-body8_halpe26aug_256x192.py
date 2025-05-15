@@ -247,6 +247,10 @@ dataset_type = 'Halpe26augDataset'
 data_mode = 'topdown'
 data_root = '../../datasets/HPE_training_data/bedlam/data/'
 
+# mapping to halpe26aug
+bedlam_halpe26aug = [(i, i) for i in range(30)]
+
+
 # train bedlam dataset
 dataset_bedlam = dict(
     type=dataset_type,
@@ -254,7 +258,12 @@ dataset_bedlam = dict(
     data_mode=data_mode,
     ann_file='bedlam_labels/bedlam_reannotated/training_annotations_16kpts.json',
     data_prefix=dict(img='training_images/'),
-    pipeline=[],
+    pipeline=[
+        dict(
+            type='KeypointConverter',
+            num_keypoints=num_keypoints,
+            mapping=bedlam_halpe26aug)
+    ],
 )
 
 # val bedlam dataset
@@ -264,7 +273,12 @@ val_bedlam = dict(
     data_mode=data_mode,
     ann_file='bedlam_labels/bedlam_reannotated/validation_annotations_16kpts.json',
     data_prefix=dict(img='validation_images/'),
-    pipeline=[],
+    pipeline=[
+        dict(
+            type='KeypointConverter',
+            num_keypoints=num_keypoints,
+            mapping=coco_halpe26aug)
+    ],
 )
 
 # crowdpose dataset settings
