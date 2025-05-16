@@ -38,11 +38,11 @@ num_keypoints = 30
 input_size = (192, 256)
 
 # runtime
-max_epochs = 2
-stage2_num_epochs = 2
+max_epochs = 700
+stage2_num_epochs = 30
 base_lr = 4e-3
-train_batch_size =8
-val_batch_size = 8
+train_batch_size = 512
+val_batch_size = 64
 
 train_cfg = dict(max_epochs=max_epochs, val_interval=10)
 randomness = dict(seed=21)
@@ -74,7 +74,7 @@ param_scheduler = [
 ]
 
 # automatically scaling LR based on the actual training batch size
-auto_scale_lr = dict(base_batch_size=8)
+auto_scale_lr = dict(base_batch_size=1024)
 
 # codec settings
 codec = dict(
@@ -205,7 +205,7 @@ train_pipeline_stage2 = [
 # base dataset settings
 dataset_type = 'CocoWholeBodyDataset'
 data_mode = 'topdown'
-data_root = '../../datasets/HPE_training_data/coco_wholebody_2017/'
+data_root = '/pfcalcul/datasets/HPE_training_data/coco_wholebody_2017/'
 
 # mapping to halpe26aug
 coco_halpe26aug = [(i, i) for i in range(17)] + [(17, 20), (18, 22), (19, 24),
@@ -245,7 +245,7 @@ val_coco = dict(
 # bedlam dataset settings
 dataset_type = 'Halpe26augDataset'
 data_mode = 'topdown'
-data_root = '../../datasets/HPE_training_data/bedlam/data/'
+data_root = '/pfcalcul/datasets/HPE_training_data/bedlam/data/'
 
 # mapping to halpe26aug
 bedlam_halpe26aug = [(i, i) for i in range(30)]
@@ -284,7 +284,7 @@ val_bedlam = dict(
 # crowdpose dataset settings
 dataset_type = 'CrowdPoseDataset'
 data_mode = 'topdown'
-data_root = '../../datasets/HPE_training_data/crowdpose/'
+data_root = '/pfcalcul/datasets/HPE_training_data/crowdpose/'
 
 # mapping to halpe26aug
 crowdpose_halpe26aug = [(0, 5), (1, 6), (2, 7), (3, 8), (4, 9), (5, 10), (6, 11),
@@ -322,7 +322,7 @@ val_crowdpose = dict(
 # mpii dataset settings
 dataset_type = 'MpiiDataset'
 data_mode = 'topdown'
-data_root = '../../datasets/HPE_training_data/mpii/'
+data_root = '/pfcalcul/datasets/HPE_training_data/mpii/'
 
 mpii_halpe26aug = [
     (0, 16),
@@ -372,7 +372,7 @@ val_mpii = dict(
 # ochuman dataset settings
 dataset_type = 'OCHumanDataset'
 data_mode = 'topdown'
-data_root = '../../datasets/HPE_training_data/ochuman/'
+data_root = '/pfcalcul/datasets/HPE_training_data/ochuman/'
 
 ochuman_halpe26aug = [(i, i) for i in range(17)]
 
