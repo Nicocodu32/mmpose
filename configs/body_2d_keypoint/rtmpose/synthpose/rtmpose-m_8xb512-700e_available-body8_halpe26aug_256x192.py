@@ -277,7 +277,7 @@ val_bedlam = dict(
         dict(
             type='KeypointConverter',
             num_keypoints=num_keypoints,
-            mapping=coco_halpe26aug)
+            mapping=bedlam_halpe26aug)
     ],
 )
 
