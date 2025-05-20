@@ -281,6 +281,46 @@ val_bedlam = dict(
     ],
 )
 
+# aic dataset settings
+dataset_type = 'AicDataset'
+data_mode = 'topdown'
+data_root = '../../datasets/HPE_training_data/AIC/'
+
+# mapping to halpe26aug
+aic_halpe26aug = [(0, 6), (1, 8), (2, 10), (3, 5), (4, 7),
+               (5, 9), (6, 12), (7, 14), (8, 16), (9, 11), (10, 13), (11, 15),
+               (12, 17), (13, 18)]
+
+dataset_aic = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file='aic_annotations/aic_train.json',
+    data_prefix=dict(img='ai_challenger_keypoint_train/keypoint_train_images/'),
+    pipeline=[
+        dict(
+            type='KeypointConverter',
+            num_keypoints=num_keypoints,
+            mapping=aic_halpe26aug)
+    ],
+)
+
+val_aic = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file='aic_annotations/aic_val.json',
+    data_prefix=dict(
+        img='ai_challenger_keypoint_val/keypoint_validation_images/'),
+    pipeline=[
+        dict(
+            type='KeypointConverter',
+            num_keypoints=num_keypoints,
+            mapping=aic_halpe26aug)
+    ],
+)
+
+
 # crowdpose dataset settings
 dataset_type = 'CrowdPoseDataset'
 data_mode = 'topdown'
@@ -369,6 +409,95 @@ val_mpii = dict(
     ],
 )
 
+
+# jhmdb dataset settings
+dataset_type = 'JhmdbDataset'
+data_mode = 'topdown'
+data_root = '../../datasets/HPE_training_data/JHMDB/'
+
+# mapping to halpe26aug
+jhmdb_halpe26aug = [
+    (0, 18),
+    (2, 17),
+    (3, 6),
+    (4, 5),
+    (5, 12),
+    (6, 11),
+    (7, 8),
+    (8, 7),
+    (9, 14),
+    (10, 13),
+    (11, 10),
+    (12, 9),
+    (13, 16),
+    (14, 15),
+]
+
+dataset_jhmdb = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file='annotations/Sub1_train.json',
+    data_prefix=dict(img='JHMDB_images/'),
+    pipeline=[
+        dict(
+            type='KeypointConverter',
+            num_keypoints=num_keypoints,
+            mapping=jhmdb_halpe26aug)
+    ],
+)
+
+val_jhmdb = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file='annotations/Sub1_test.json',
+    data_prefix=dict(img='JHMDB_images/'),
+    pipeline=[
+        dict(
+            type='KeypointConverter',
+            num_keypoints=num_keypoints,
+            mapping=jhmdb_halpe26aug)
+    ],
+)
+
+
+# halpe dataset settings
+dataset_type = 'HalpeDataset'
+data_mode = 'topdown'
+data_root = '../../datasets/HPE_training_data/Halpe/'
+
+# mapping to halpe26aug
+halpe_halpe26aug = [(i, i) for i in range(26)]
+
+dataset_halpe = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file='Halpe_annotations/halpe_train_v1.json',
+    data_prefix=dict(img='HICO_DET/images/train2015'),
+    pipeline=[
+        dict(
+            type='KeypointConverter',
+            num_keypoints=num_keypoints,
+            mapping=halpe_halpe26aug)
+    ],
+)
+
+val_halpe = dict(
+    type=dataset_type,
+    data_root=data_root,
+    data_mode=data_mode,
+    ann_file='Halpe_annotations/halpe_val_v1.json',
+    data_prefix=dict(img='../coco_wholebody_2017/val2017/'),
+    pipeline=[
+        dict(
+            type='KeypointConverter',
+            num_keypoints=num_keypoints,
+            mapping=halpe_halpe26aug)
+    ],
+)
+
 # ochuman dataset settings
 dataset_type = 'OCHumanDataset'
 data_mode = 'topdown'
@@ -403,8 +532,11 @@ train_dataloader = dict(
         datasets=[
             dataset_coco,
             dataset_bedlam,
+            dataset_aic,
             dataset_crowdpose,
             dataset_mpii,
+            dataset_jhmdb,
+            dataset_halpe,
         ],
         pipeline=train_pipeline,
         test_mode=False,
@@ -423,8 +555,11 @@ val_dataloader = dict(
         datasets=[
             val_coco,
             val_bedlam,
+            val_aic,
             val_crowdpose,
             val_mpii,
+            val_jhmdb,
+            val_halpe,
             val_ochuman,
         ],
         pipeline=val_pipeline,
