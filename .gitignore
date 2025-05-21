@@ -2,6 +2,9 @@
 
 pretrain/
 demo/mmdetection_cfg/configs
+mmcv
+mmdetection
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
