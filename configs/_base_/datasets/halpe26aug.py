@@ -11,33 +11,33 @@ dataset_info = dict(
     ),
     keypoint_info={
         0:
-        dict(name='nose', id=0, color=[51, 153, 255], type='upper', swap=''),
+        dict(name='nose', id=0, color=[255, 0, 0], type='upper', swap=''),
         1:
         dict(
             name='left_eye',
             id=1,
-            color=[51, 153, 255],
+            color=[255, 0, 0],
             type='upper',
             swap='right_eye'),
         2:
         dict(
             name='right_eye',
             id=2,
-            color=[51, 153, 255],
+            color=[255, 0, 0],
             type='upper',
             swap='left_eye'),
         3:
         dict(
             name='left_ear',
             id=3,
-            color=[51, 153, 255],
+            color=[255, 0, 0],
             type='upper',
             swap='right_ear'),
         4:
         dict(
             name='right_ear',
             id=4,
-            color=[51, 153, 255],
+            color=[255, 0, 0],
             type='upper',
             swap='left_ear'),
         5:
@@ -125,16 +125,16 @@ dataset_info = dict(
             type='lower',
             swap='left_ankle'),
         17:
-        dict(name='head', id=17, color=[255, 128, 0], type='upper', swap=''),
+        dict(name='head', id=17, color=[255, 0, 0], type='upper', swap=''),
         18:
-        dict(name='neck', id=18, color=[255, 128, 0], type='upper', swap=''),
+        dict(name='neck', id=18, color=[51, 153, 255], type='upper', swap=''),
         19:
-        dict(name='hip', id=19, color=[255, 128, 0], type='lower', swap=''),
+        dict(name='hip', id=19, color=[51, 153, 255], type='lower', swap=''),
         20:
         dict(
             name='left_big_toe',
             id=20,
-            color=[255, 128, 0],
+            color=[0, 255, 0],
             type='lower',
             swap='right_big_toe'),
         21:
@@ -148,7 +148,7 @@ dataset_info = dict(
         dict(
             name='left_small_toe',
             id=22,
-            color=[255, 128, 0],
+            color=[0, 255, 0],
             type='lower',
             swap='right_small_toe'),
         23:
@@ -162,7 +162,7 @@ dataset_info = dict(
         dict(
             name='left_heel',
             id=24,
-            color=[255, 128, 0],
+            color=[0, 255, 0],
             type='lower',
             swap='right_heel'),
         25:
@@ -190,7 +190,7 @@ dataset_info = dict(
         dict(
             name='r_bpinky',
             id=28,
-            color=[0, 255, 0],
+            color=[255, 128, 0],
             type='upper',
             swap='l_bpinky'),
         29:
@@ -215,7 +215,7 @@ dataset_info = dict(
         5:
         dict(link=('right_hip', 'hip'), id=5, color=[255, 128, 0]),
         6:
-        dict(link=('head', 'neck'), id=6, color=[51, 153, 255]),
+        dict(link=('head', 'neck'), id=6, color=[255, 0, 0]),
         7:
         dict(link=('neck', 'hip'), id=7, color=[51, 153, 255]),
         8:
@@ -233,20 +233,20 @@ dataset_info = dict(
         13:
         dict(link=('right_elbow', 'right_wrist'), id=13, color=[255, 128, 0]),
         14:
-        dict(link=('left_eye', 'right_eye'), id=14, color=[51, 153, 255]),
+        dict(link=('left_eye', 'right_eye'), id=14, color=[255, 0, 0]),
         15:
-        dict(link=('nose', 'left_eye'), id=15, color=[51, 153, 255]),
+        dict(link=('nose', 'left_eye'), id=15, color=[255, 0, 0]),
         16:
-        dict(link=('nose', 'right_eye'), id=16, color=[51, 153, 255]),
+        dict(link=('nose', 'right_eye'), id=16, color=[255, 0, 0]),
         17:
-        dict(link=('left_eye', 'left_ear'), id=17, color=[51, 153, 255]),
+        dict(link=('left_eye', 'left_ear'), id=17, color=[255, 0, 0]),
         18:
-        dict(link=('right_eye', 'right_ear'), id=18, color=[51, 153, 255]),
+        dict(link=('right_eye', 'right_ear'), id=18, color=[255, 0, 0]),
         19:
-        dict(link=('left_ear', 'left_shoulder'), id=19, color=[51, 153, 255]),
+        dict(link=('left_ear', 'left_shoulder'), id=19, color=[255, 0, 0]),
         20:
         dict(
-            link=('right_ear', 'right_shoulder'), id=20, color=[51, 153, 255]),
+            link=('right_ear', 'right_shoulder'), id=20, color=[255, 0, 0]),
         21:
         dict(link=('left_ankle', 'left_big_toe'), id=21, color=[0, 255, 0]),
         22:
@@ -265,16 +265,14 @@ dataset_info = dict(
         dict(link=('right_ankle', 'right_heel'), id=26, color=[255, 128, 0]),
         27:dict(link=('left_wrist', 'l_bpinky'), id=27, color=[0, 255, 0]),
         28:dict(link=('left_wrist', 'l_bindex'), id=28, color=[0, 255, 0]),
-        29:dict(link=('l_bpinky', 'l_bindex'), id=29, color=[0, 255, 0]),
-        30:dict(link=('right_wrist', 'r_bpinky'), id=30, color=[255, 128, 0]),
-        31:dict(link=('right_wrist', 'r_bindex'), id=31, color=[255, 128, 0]),
-        32:dict(link=('r_bpinky', 'r_bindex'), id=32, color=[255, 128, 0]),
+        29:dict(link=('right_wrist', 'r_bpinky'), id=30, color=[255, 128, 0]),
+        30:dict(link=('right_wrist', 'r_bindex'), id=31, color=[255, 128, 0]),
     },
     # the joint_weights is modified by MMPose Team
     joint_weights=[
         1., 1., 1., 1., 1., 1., 1., 1.2, 1.2, 1.5, 1.5, 1., 1., 1.2, 1.2, 1.5,
         1.5
-    ] + [1., 1., 1.2] + [1.5] * 6 + [1.] *6,
+    ] + [1., 1., 1.2] + [1.5] * 6 + [1.] *4,
 
     # 'https://github.com/Fang-Haoshu/Halpe-FullBody/blob/master/'
     # 'HalpeCOCOAPI/PythonAPI/halpecocotools/cocoeval.py#L245'
