@@ -4,6 +4,10 @@ pretrain/
 demo/mmdetection_cfg/configs
 mmcv
 mmdetection
+<<<<<<< HEAD
+
+=======
+>>>>>>> 2b7abe35e4386b8dfbb644ab7a968e406065d8f5
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
