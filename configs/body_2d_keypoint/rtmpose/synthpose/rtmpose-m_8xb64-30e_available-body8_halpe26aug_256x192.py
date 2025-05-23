@@ -514,7 +514,7 @@ val_ochuman = dict(
 train_sampler = dict(
     type="MultiSourceSampler",
     batch_size=train_batch_size,
-    source_ratio=[1, 1, 1, 1],
+    source_ratio=[1, 1, 1, 1, 1, 1, 1],
     shuffle=True,
 )
 
