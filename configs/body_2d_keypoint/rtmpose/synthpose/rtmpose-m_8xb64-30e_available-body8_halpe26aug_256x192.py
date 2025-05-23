@@ -111,19 +111,29 @@ model = dict(
             'rtmposev1/rtmpose-m_simcc-body7_pt-body7_420e-256x192-e48f03d0_20230504.pth'  # noqa
         )),
     head=dict(
-        type="HeatmapHead",
+        type='RTMCCHead',
         in_channels=768,
         out_channels=num_keypoints,
-        deconv_out_channels=(256, 256),
-        deconv_kernel_sizes=(4, 4),
-        loss=dict(type="KeypointMSELoss", use_target_weight=True),
-        decoder=codec,
-    ),
-    test_cfg=dict(
-        flip_test=True,
-        flip_mode="heatmap",
-        shift_heatmap=False,
-    ),
+        input_size=input_size,
+        in_featuremap_size=tuple([s // 32 for s in input_size]),
+        simcc_split_ratio=codec['simcc_split_ratio'],
+        final_layer_kernel_size=7,
+        gau_cfg=dict(
+            hidden_dims=256,
+            s=128,
+            expansion_factor=2,
+            dropout_rate=0.,
+            drop_path=0.,
+            act_fn='SiLU',
+            use_rel_bias=False,
+            pos_enc=False),
+        loss=dict(
+            type='KLDiscretLoss',
+            use_target_weight=True,
+            beta=10.,
+            label_softmax=True),
+        decoder=codec),
+    test_cfg=dict(flip_test=True)
 )
 
 backend_args = dict(backend='local')
